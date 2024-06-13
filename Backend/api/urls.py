@@ -4,5 +4,5 @@ from . import views
 
 urlpatterns = [
     path('docs-info', DocGeneralInfoView.as_view()), #redirects to api/views.py
-    path('hello-world', views.hello_world, name='hello_world'),
+    path('add-doc', views.add_doc, name='add_doc'),
 ]
