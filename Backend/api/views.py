@@ -6,7 +6,9 @@ from rest_framework.response import Response
 from .models import DocGeneralInfo
 from .serializers import DocGeneralInfoSerializer
 from datetime import datetime, timedelta
-
+from pymongo import MongoClient
+from gridfs import GridFS
+from django.conf import settings
 # Create your views (endpoints) here.
 
 @api_view(['GET'])
@@ -41,3 +43,42 @@ def add_doc(request):
         return Response(serializer.data)
     except Exception as e:
         return Response({'error': str(e)})
+    
+
+@api_view(['POST'])
+def add_pdf(request):
+    try:
+        pdf_file = request.FILES.get('file')
+        if not pdf_file:
+            return Response({'error': 'No PDF file provided'}, status=400)
+
+        # Connect to MongoDB
+        client = MongoClient(settings.DATABASES['default']['CLIENT']['host'])
+        db = client[settings.DATABASES['default']['NAME']]
+        fs = GridFS(db)
+
+        # Save the file to GridFS
+        file_id = fs.put(pdf_file, filename=pdf_file.name)
+
+        return Response({'message': 'PDF added successfully', 'file_id': str(file_id)})
+    except Exception as e:
+        return Response({'error': str(e)}, status=400)
+    
+# @api_view(['GET'])
+# def get_pdf(request, file_id):
+#     try:
+#         # Connect to MongoDB
+#         client = MongoClient(settings.DATABASES['default']['CLIENT']['host'])
+#         db = client[settings.DATABASES['default']['NAME']]
+#         fs = GridFS(db)
+
+#         # Retrieve the file from GridFS
+#         file = fs.get(file_id)
+
+#         # Create a response with the PDF file
+#         response = HttpResponse(file.read(), content_type='application/pdf')
+#         response['Content-Disposition'] = 'attachment; filename="{}"'.format(file.filename)
+#         return response
+#     except Exception as e:
+#         return HttpResponse(str(e), status=400)
+# needs fixing !!!!!
