@@ -1,16 +1,16 @@
 import { Button } from '@mui/material';
-
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 function AddPdf() {
     
-    function handleClick() {
+    function clickHandler() {
         const fileInput = document.createElement('input');
         fileInput.type = 'file';
         fileInput.accept = '.pdf';
         fileInput.click();
-        fileInput.addEventListener('change', handleFileSelect);
+        fileInput.addEventListener('change', fileSelectHandler);
     }
 
-    async function handleFileSelect(event) {
+    async function fileSelectHandler(event) {
         const file = event.target.files[0];
         const formData = new FormData();
         formData.append('file', file);
@@ -38,7 +38,8 @@ function AddPdf() {
                     fontSize: "13px",
                 }}
                 variant="contained"
-                onClick={handleClick}
+                startIcon={<CloudUploadIcon />}
+                onClick={clickHandler}
             >
                 Add PDF
             </Button>

@@ -11,3 +11,12 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
 }
+
+.flexContainer {
+  display: flex;
+  margin-top: 20px;
+}
+
+.addPdfContainer {
+  margin-right: 20px;
+}
