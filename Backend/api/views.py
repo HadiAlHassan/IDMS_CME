@@ -9,7 +9,17 @@ from datetime import datetime, timedelta
 from pymongo import MongoClient
 from gridfs import GridFS
 from django.conf import settings
-# Create your views (endpoints) here.
+from bson.objectid import ObjectId
+from gridfs.errors import NoFile
+from pymongo import errors
+from django.shortcuts import redirect
+from django.http import JsonResponse
+
+
+def connect_to_mongo():
+    client = MongoClient(settings.DATABASES['default']['CLIENT']['host'])
+    db = client[settings.DATABASES['default']['NAME']]
+    return db
 
 @api_view(['GET'])
 def view_docs(request):
@@ -53,32 +63,72 @@ def add_pdf(request):
             return Response({'error': 'No PDF file provided'}, status=400)
 
         # Connect to MongoDB
-        client = MongoClient(settings.DATABASES['default']['CLIENT']['host'])
-        db = client[settings.DATABASES['default']['NAME']]
-        fs = GridFS(db)
+        db = connect_to_mongo()
 
         # Save the file to GridFS
-        file_id = fs.put(pdf_file, filename=pdf_file.name)
+        file_id = db.put(pdf_file, filename=pdf_file.name)
 
         return Response({'message': 'PDF added successfully', 'file_id': str(file_id)})
     except Exception as e:
         return Response({'error': str(e)}, status=400)
     
-# @api_view(['GET'])
-# def get_pdf(request, file_id):
-#     try:
-#         # Connect to MongoDB
-#         client = MongoClient(settings.DATABASES['default']['CLIENT']['host'])
-#         db = client[settings.DATABASES['default']['NAME']]
-#         fs = GridFS(db)
+@api_view(['GET'])
+def get_pdf_by_id(request, file_id):
+    try:
+        # Connect to MongoDB
+        db = connect_to_mongo()
 
-#         # Retrieve the file from GridFS
-#         file = fs.get(file_id)
+        # Ensure the file_id is a valid ObjectId
+        if not ObjectId.is_valid(file_id):
+            return HttpResponse('Invalid file ID', status=400)
+        
+        fs = GridFS(db)
+        # Retrieve the file from GridFS
+        file = fs.get(ObjectId(file_id))
 
-#         # Create a response with the PDF file
-#         response = HttpResponse(file.read(), content_type='application/pdf')
-#         response['Content-Disposition'] = 'attachment; filename="{}"'.format(file.filename)
-#         return response
-#     except Exception as e:
-#         return HttpResponse(str(e), status=400)
-# needs fixing !!!!!
+        # Create a response with the PDF file
+        response = HttpResponse(file.read(), content_type='application/pdf')
+        response['Content-Disposition'] = f'inline; filename="{file.filename}"'
+        return response
+    except NoFile:
+        return HttpResponse('File not found', status=404)
+    except errors.PyMongoError as e:
+        return HttpResponse(f'Database error: {str(e)}', status=500)
+
+def get_file_id_by_name(file_name):
+    try:
+        # Connect to MongoDB
+        db = connect_to_mongo()
+
+        # Query the file by name
+        file = db.fs.files.find_one({'filename': {'$regex': file_name, '$options': 'i'}})
+        if file:
+            return str(file['_id'])
+        else:
+            return None
+    except errors.PyMongoError as e:
+        return str(e)
+
+@api_view(['GET'])
+def get_pdf_by_name(request, file_name):
+    # Use the existing function to get the file ID by name
+    file_id = get_file_id_by_name(file_name)
+    
+    if file_id:
+        # Redirect to the get_pdf view if the file ID was found
+        return redirect('get_pdf_by_id', file_id=file_id)
+    else:
+        # Return an error response if the file was not found
+        return HttpResponse('File not found', status=404)
+
+@api_view(['GET'])
+def list_files(request):
+    try:
+        db = connect_to_mongo()
+        # Assuming your files are stored in a collection named 'fs.files'
+        files_collection = db['fs.files']
+        files = files_collection.find({}, {'_id': 1, 'filename': 1})  # Fetch only the _id and filename fields
+        file_list = [{'name': file['filename'], 'id': str(file['_id'])} for file in files]
+        return JsonResponse({'files': file_list})
+    except errors.PyMongoError as e:
+        return HttpResponse(f'Database error: {str(e)}', status=500)   
