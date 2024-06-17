@@ -1,0 +1,39 @@
+.form {
+  position: relative;
+  background-color: #1769aa;
+  padding: 1rem;
+  width: 30rem;
+  margin: 2rem auto;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.form label {
+  display: block;
+  margin-top: -3rem;
+  color: #eadbfb;
+  font-weight: bold;
+}
+
+.form input,
+.form textarea {
+  display: block;
+  width: 100%;
+  font: inherit;
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: none;
+  background-color: #3494e3;
+  color: #eadbfb;
+}
+
+.form input {
+  width: 95%;
+}
+
+.actions {
+  position: absolute;
+  top: -1rem;
+  right: -28.5rem;
+  color: #eadbfb;
+}
