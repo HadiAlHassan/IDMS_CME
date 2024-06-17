@@ -61,12 +61,10 @@ def add_pdf(request):
         pdf_file = request.FILES.get('file')
         if not pdf_file:
             return Response({'error': 'No PDF file provided'}, status=400)
-
-        # Connect to MongoDB
         db = connect_to_mongo()
 
-        # Save the file to GridFS
-        file_id = db.put(pdf_file, filename=pdf_file.name)
+        fs = GridFS(db)
+        file_id = fs.put(pdf_file, filename=pdf_file.name)
 
         return Response({'message': 'PDF added successfully', 'file_id': str(file_id)})
     except Exception as e:
@@ -75,18 +73,14 @@ def add_pdf(request):
 @api_view(['GET'])
 def get_pdf_by_id(request, file_id):
     try:
-        # Connect to MongoDB
         db = connect_to_mongo()
 
-        # Ensure the file_id is a valid ObjectId
         if not ObjectId.is_valid(file_id):
             return HttpResponse('Invalid file ID', status=400)
         
         fs = GridFS(db)
-        # Retrieve the file from GridFS
+        
         file = fs.get(ObjectId(file_id))
-
-        # Create a response with the PDF file
         response = HttpResponse(file.read(), content_type='application/pdf')
         response['Content-Disposition'] = f'inline; filename="{file.filename}"'
         return response
@@ -97,10 +91,7 @@ def get_pdf_by_id(request, file_id):
 
 def get_file_id_by_name(file_name):
     try:
-        # Connect to MongoDB
         db = connect_to_mongo()
-
-        # Query the file by name
         file = db.fs.files.find_one({'filename': {'$regex': file_name, '$options': 'i'}})
         if file:
             return str(file['_id'])
@@ -111,24 +102,19 @@ def get_file_id_by_name(file_name):
 
 @api_view(['GET'])
 def get_pdf_by_name(request, file_name):
-    # Use the existing function to get the file ID by name
     file_id = get_file_id_by_name(file_name)
-    
     if file_id:
-        # Redirect to the get_pdf view if the file ID was found
         return redirect('get_pdf_by_id', file_id=file_id)
     else:
-        # Return an error response if the file was not found
         return HttpResponse('File not found', status=404)
 
 @api_view(['GET'])
 def list_files(request):
     try:
         db = connect_to_mongo()
-        # Assuming your files are stored in a collection named 'fs.files'
         files_collection = db['fs.files']
-        files = files_collection.find({}, {'_id': 1, 'filename': 1})  # Fetch only the _id and filename fields
-        file_list = [{'name': file['filename'], 'id': str(file['_id'])} for file in files]
+        files = files_collection.find({}, {'filename': 1}) 
+        file_list = [{'name': file['filename']} for file in files] 
         return JsonResponse({'files': file_list})
     except errors.PyMongoError as e:
         return HttpResponse(f'Database error: {str(e)}', status=500)   
