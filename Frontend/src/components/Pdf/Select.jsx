@@ -36,6 +36,7 @@ function MultipleSelectNative(props) {
       }
     }
     setPersonName(value);
+    props.onSelectionChange(value); // Pass the selected values to the parent component
   };
   const filteredNames = names.filter((name) =>
     name.toLowerCase().includes(props.searchInput.toLowerCase())

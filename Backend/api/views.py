@@ -118,3 +118,23 @@ def list_files(request):
         return JsonResponse({'files': file_list})
     except errors.PyMongoError as e:
         return HttpResponse(f'Database error: {str(e)}', status=500)   
+    
+@api_view(['POST'])
+def handle_selected_pdfs(request):
+    try:
+        data = request.data
+        selected_pdfs = data.get('selectedPdfs', [])
+        
+        if not isinstance(selected_pdfs, list):
+            return JsonResponse({'error': 'Invalid data format. Expected a list of filenames.'}, status=400)
+        
+        pdf_results = []
+        
+        for pdf in selected_pdfs:
+            result = get_pdf_by_name(request, pdf)
+            pdf_results.append(result)
+        
+        return JsonResponse({'message': 'Successfully processed selected PDFs', 'selectedPdfs': selected_pdfs, 'results': pdf_results})
+        
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
