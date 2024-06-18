@@ -4,14 +4,14 @@
   padding: 1rem;
   width: 30rem;
   margin: 2rem auto;
-  border-radius: 6px;
+  border-radius: 0.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .form label {
   display: block;
-  margin-top: -3rem;
-  color: #eadbfb;
+  margin-top: 0.5rem;
+  color: #f2f2f2 !important;
   font-weight: bold;
 }
 
@@ -24,16 +24,33 @@
   border-radius: 6px;
   border: none;
   background-color: #3494e3;
-  color: #eadbfb;
+  color: #f2f2f2;
 }
 
 .form input {
   width: 95%;
 }
 
-.actions {
+.actions.actions {
   position: absolute;
-  top: -1rem;
-  right: -28.5rem;
-  color: #eadbfb;
+  top: 0;
+  right: 0;
+  color: #353535;
+}
+
+@media (max-width: 768px) {
+  .form.form {
+    width: 60%;
+    padding: 0.5rem;
+  }
+
+  .actions.actions {
+    right: 0rem;
+  }
+
+  .form.form label,
+  .form.form input,
+  .form.text textarea {
+    font-size: 0.8rem;
+  }
 }

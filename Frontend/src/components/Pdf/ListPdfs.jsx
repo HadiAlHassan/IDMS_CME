@@ -4,18 +4,14 @@ import Button from "@mui/material/Button";
 import SearchIcon from "@mui/icons-material/Search";
 import BasicModal from "./Modal";
 import MultipleSelectNative from "./Select";
+import classes from "./ListPdfs.module.css";
 function ListPdfs() {
   const [modalOpen, setModalOpen] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   return (
     <div>
       <Button
-        style={{
-          borderRadius: 10,
-          backgroundColor: "#1769aa",
-          padding: "10px",
-          fontSize: "13px",
-        }}
+        className={classes.button}
         variant="contained"
         startIcon={<SearchIcon />}
         onClick={() => setModalOpen(true)}

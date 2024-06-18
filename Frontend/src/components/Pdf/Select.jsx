@@ -42,17 +42,36 @@ function MultipleSelectNative(props) {
   );
   return (
     <div>
-      <FormControl sx={{ py: 1, m: 2, minWidth: 450, maxWidth: 450 }}>
-        <InputLabel htmlFor="select-multiple-native">Pdfs</InputLabel>
+      <FormControl
+        className={classes.FormControl}
+        sx={{
+          py: 1,
+          m: 2,
+          minWidth: "90%",
+          maxWidth: "90%",
+        }}
+      >
+        <InputLabel shrink htmlFor="select-multiple-native">
+          PDFs
+        </InputLabel>
         <Select
           multiple
           native
+          sx={{
+            "&:hover .MuiOutlinedInput-notchedOutline": {
+              borderColor: "#f2f2f2",
+            },
+            "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+              borderColor: "#f2f2f2",
+            },
+          }}
           value={personName}
           onChange={handleChangeMultiple}
           label="Native"
           inputProps={{
             id: "select-multiple-native",
           }}
+          className={classes.select}
         >
           {filteredNames.map((name) => (
             <option key={name} value={name}>

@@ -1,5 +1,6 @@
 import { Button } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import classes from "./AddPdf.module.css";
 function AddPdf() {
   function clickHandler() {
     const fileInput = document.createElement("input");
@@ -30,12 +31,7 @@ function AddPdf() {
   return (
     <div>
       <Button
-        style={{
-          borderRadius: 10,
-          backgroundColor: "#1769aa",
-          padding: "10px",
-          fontSize: "13px",
-        }}
+        className={classes.button}
         variant="contained"
         startIcon={<CloudUploadIcon />}
         onClick={clickHandler}

@@ -1,0 +1,13 @@
+.button.button {
+  border-radius: 0.7rem;
+  background-color: #1769aa;
+  padding: 0.7rem;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .button.button {
+    padding: 0.5rem;
+    font-size: 0.7rem;
+  }
+}
