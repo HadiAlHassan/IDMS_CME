@@ -30,6 +30,9 @@
 .form input {
   width: 95%;
 }
+.form input:hover {
+  border: 2px solid #f2f2f2;
+}
 
 .actions.actions {
   position: absolute;
@@ -53,4 +56,11 @@
   .form.text textarea {
     font-size: 0.8rem;
   }
+}
+
+.button.button {
+  border-radius: 0.25rem;
+  background-color: #3494e3;
+  padding: 0.4rem;
+  font-size: 0.6rem;
 }

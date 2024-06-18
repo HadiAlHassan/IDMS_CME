@@ -4,6 +4,7 @@ import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import MultipleSelectNative from "./Select";
 import styles from "./Select.module.css";
+import { Button } from "@mui/material";
 function BasicModal(props) {
   const handleClose = () => props.setOpen(false);
 
@@ -20,17 +21,19 @@ function BasicModal(props) {
             <IconButton className={classes.actions} onClick={handleClose}>
               <CloseIcon />
             </IconButton>
-            <p>
-              <label htmlFor="search">Search for a PDF</label>
-              <input
-                type="text"
-                id="pdfname"
-                value={props.searchInput}
-                onChange={(userSearch) =>
-                  props.setSearchInput(userSearch.target.value)
-                }
-              />
-            </p>
+            <div className="Search Bar">
+              <p>
+                <label htmlFor="search">Search for a PDF</label>
+                <input
+                  type="text"
+                  id="pdfname"
+                  value={props.searchInput}
+                  onChange={(userSearch) =>
+                    props.setSearchInput(userSearch.target.value)
+                  }
+                />
+              </p>
+            </div>
             <div className="Multiple Select Container">
               <MultipleSelectNative
                 className={styles.formControl}
@@ -38,6 +41,9 @@ function BasicModal(props) {
                 id="select-multiple-native"
               />
             </div>
+            <Button className={classes.button} variant="contained">
+              VIEW PDF
+            </Button>
           </form>
         </div>
       </Modal>
