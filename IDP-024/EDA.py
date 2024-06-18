@@ -1,0 +1,123 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import string
+import re
+import nltk
+from collections import Counter
+from tqdm import trange
+from nltk import tokenize
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer
+from nltk.probability import FreqDist
+from collections import Counter
+from sklearn.feature_extraction.text import CountVectorizer
+import warnings
+from wordcloud import WordCloud
+from pathlib import Path
+
+current_dir = Path(__file__).resolve().parent
+dataset_path = current_dir / 'Non_legal_dataset.csv'
+
+if not dataset_path.is_file():
+    print(f"File not found: {dataset_path}")
+else:
+    
+    dataset = pd.read_csv(dataset_path)
+
+
+#Initial Inspection: Data structure, types, basic info
+print(dataset.head())
+print("-------------")
+print(dataset.info())
+print("-------------")
+print(dataset["Label"].value_counts())
+print("-------------")
+
+#Shape
+print("Shape of data: ", dataset.shape) # --> (2225 rows, 2 column)
+print("-------------")
+
+#Data Cleaning & Handling missing values
+dataset=dataset.drop_duplicates()
+dataset=dataset.dropna()
+print(dataset.isnull().sum())
+print("-------------")
+
+# Basic statistics of the text length
+dataset['text_length'] = dataset['Text'].apply(lambda x: len(x.split()))
+print(dataset['text_length'].describe())
+print("-------------")
+
+dataset=dataset.groupby('Label').filter(lambda x:len(x)>200).reset_index(drop=True)
+print('Label=>',len(dataset['Label'].unique())) # Checking the number of labels that has a minimum of 200 texts
+print("-------------")
+
+stop_words= set(stopwords.words("english"))
+ps=PorterStemmer()
+
+def preprocess_text(text):
+    
+    text = text.lower()
+    text = re.sub(r'[^\w\s]', '', text)
+
+    words = word_tokenize(text)
+    words = [ps.stem(word) for word in words if word not in stop_words]
+    return ' '.join(words)
+
+dataset['clean_text'] = dataset['Text'].apply(preprocess_text)
+print(dataset['clean_text'].head())
+print("-------------")
+
+
+# Plotting the number of labels per text // label distribution
+label_counts = dataset['Label'].value_counts().sort_index()
+plt.figure(figsize=(10, 6))
+label_counts.plot(kind='bar', color='red')
+plt.title('Number of Texts per Label')
+plt.xlabel('Label')
+plt.ylabel('Number of Texts')
+plt.xticks(rotation=0)
+plt.show()
+
+#Most Common words in the dataset
+all_text = ' '.join(dataset['clean_text'])
+word_counts = Counter(all_text.split())
+common_words = word_counts.most_common(20)
+print(common_words)
+print("-------------")
+
+# Word cloud
+wordcloud = WordCloud(width=800, height=400, background_color='white').generate(" ".join(dataset['clean_text']))
+plt.figure(figsize=(10, 6))
+plt.imshow(wordcloud, interpolation='bilinear')
+plt.axis('off')
+plt.title('Word Cloud')
+plt.show()
+
+#N-gram
+
+def plot_ngrams(texts,n,top_k):
+    vec=CountVectorizer(ngram_range=(n,n))
+    ngrams = vec.fit_transform(texts)
+    ngrams = vec.fit_transform(texts)
+    sum_ngrams = ngrams.sum(axis=0)
+    ngram_freq = [(word, sum_ngrams[0, idx]) for word, idx in vec.vocabulary_.items()]
+    ngram_freq = sorted(ngram_freq, key=lambda x: x[1], reverse=True)[:top_k]
+    
+    df_ngram = pd.DataFrame(ngram_freq, columns=['ngram', 'frequency'])
+    
+    plt.figure(figsize=(10, 6))
+    sns.barplot(x='frequency', y='ngram', data=df_ngram)
+    plt.title(f'Top {top_k} {n}-grams')
+    plt.xlabel('Frequency')
+    plt.ylabel(f'{n}-gram')
+    plt.show()
+   
+#Testing some n-grams plots
+plot_ngrams(dataset['clean_text'], n=2, top_k=20)
+plot_ngrams(dataset['clean_text'], n=3, top_k=20)
+
+
