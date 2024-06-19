@@ -2,7 +2,7 @@ import * as React from "react";
 import { useState } from "react";
 import Button from "@mui/material/Button";
 import SearchIcon from "@mui/icons-material/Search";
-import BasicModal from "./Modal";
+import ViewPdfModal from "./ViewPdfModal";
 import MultipleSelectNative from "./Select";
 import classes from "./ListPdfs.module.css";
 function ListPdfs() {
@@ -16,16 +16,16 @@ function ListPdfs() {
         startIcon={<SearchIcon />}
         onClick={() => setModalOpen(true)}
       >
-        List PDFs
+        Look for PDFs
       </Button>
-      <BasicModal
+      <ViewPdfModal
         open={modalOpen}
         setOpen={setModalOpen}
         setSearchInput={setSearchInput}
         searchInput={searchInput}
       >
         <MultipleSelectNative searchInput={searchInput} />
-      </BasicModal>
+      </ViewPdfModal>
     </div>
   );
 }

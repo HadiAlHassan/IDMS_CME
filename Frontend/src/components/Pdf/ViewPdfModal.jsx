@@ -1,5 +1,5 @@
 import Modal from "@mui/material/Modal";
-import classes from "./Modal.module.css";
+import classes from "./ViewPdfModal.module.css";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import MultipleSelectNative from "./Select";
@@ -7,7 +7,7 @@ import styles from "./Select.module.css";
 import { Button } from "@mui/material";
 import { useState } from "react";
 import axios from "axios";
-function BasicModal(props) {
+function ViewPdfModal(props) {
   const handleClose = () => props.setOpen(false);
 
   const [selectedPdfs, setSelectedPdfs] = useState([]);
@@ -86,4 +86,4 @@ function BasicModal(props) {
     </div>
   );
 }
-export default BasicModal;
+export default ViewPdfModal;

@@ -50,7 +50,7 @@ def add_doc(request):
         print(serializer)
         serializer.is_valid(raise_exception=True) #based on the serializer class which is also based on the model class
         serializer.save()
-        return Response(serializer.data)
+        return True
     except Exception as e:
         return Response({'error': str(e)})
     
@@ -64,12 +64,25 @@ def add_pdf(request):
         db = connect_to_mongo()
 
         fs = GridFS(db)
+        
+        
+        existing_file = fs.find_one({'filename': pdf_file.name})
+        if existing_file:
+            return Response({'error': 'File already exists'}, status=400)
+        
         file_id = fs.put(pdf_file, filename=pdf_file.name)
-
-        return Response({'message': 'PDF added successfully', 'file_id': str(file_id)})
+        """
+        Here I need to implement the code to save the file metadata in the database for now i will just save the file_id in the general info cluster
+        """
+        serializer = DocGeneralInfoSerializer(data={'source': 'PDF', 'title': pdf_file.name, 'author': 'Ahmad'})
+        if serializer.is_valid():
+            serializer.save()
+            
+            return Response({'message': 'PDF added successfully', 'file_id': str(file_id)})
+        else:
+            return Response({'error': 'Failed to add metadata and store the PDF', 'details': serializer.errors}, status=400)
     except Exception as e:
         return Response({'error': str(e)}, status=400)
-    
 @api_view(['GET'])
 def get_pdf_by_id(request, file_id):
     try:
