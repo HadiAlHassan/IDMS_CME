@@ -1,20 +1,18 @@
 from pathlib import Path
 import pandas as pd
 
-# Get the current directory of the script
+
 current_dir = Path(__file__).resolve().parent
 
-# Define the path to the dataset
+
 dataset_path = current_dir / 'Datasets' / 'terms_definitions.csv'
 
-# Check if the file exists
 if not dataset_path.is_file():
     print(f"File not found: {dataset_path}")
 else:
-    # Load the dataset
+    
     terms_df = pd.read_csv(dataset_path)
 
-    # Classifications based on the provided categories
     court_documents = {
         "Acquittal", "Ad hominem attack", "Admissible", "ADR", "Affirm", "Affirmative defense", "Amicus curiae",
         "Answer", "Appeal", "Appellant", "Appellate court", "Appellee", "Arbitration", "Arraignment", "Assets",
@@ -50,7 +48,7 @@ else:
         "Petition", "Plea", "Subpoena", "Subpoena duces tecum", "Summons", "Warrant", "Writ"
     }
 
-    # Function to classify words into categories
+ 
     def classify_word(word):
         categories = []
         if word in court_documents:
@@ -61,10 +59,9 @@ else:
             categories.append('Legal Forms')
         return ' or '.join(categories) if categories else 'Unknown'
 
-    # Apply classification to the dataframe
+ 
     terms_df['Category'] = terms_df['Word'].apply(classify_word)
 
-    # Save the updated dataframe to a new CSV file
     output_path = current_dir / 'terms_definition_with_categories.csv'
     terms_df.to_csv(output_path, index=False)
 
