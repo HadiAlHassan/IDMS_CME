@@ -7,14 +7,14 @@ from sklearn.metrics import classification_report, f1_score
 import joblib
 
 current_dir = Path(__file__).resolve().parent
-dataset_path = current_dir.parent / 'IDP-024' / 'Non_legal_dataset.csv'
+dataset_path = current_dir.parent / 'Datasets' / 'Non_legal_dataset.csv'
 
 if not dataset_path.is_file():
     print(f"File not found: {dataset_path}")
 else:
     dataset = pd.read_csv(dataset_path)
 
-#print(dataset.head())
+print(dataset.head())
 
 vectorizer = TfidfVectorizer(stop_words='english', max_features=1000)
 X = vectorizer.fit_transform(dataset['Text'])
@@ -37,7 +37,24 @@ print("Weighted F1 Score:", f1)
 print("Classification Report:")
 print(classification_report(y_test, y_pred, target_names=['Politics','Sport','Technology','Entertainment','Business']))
 
+fine_tuned_model=joblib.load("LogisticRegression_best_hyperopt.pkl")
+y_pred_fine_tuned=fine_tuned_model.predict(X_test)
+
+print("---------------------")
+
+# Evaluate the Normal Logistic Regression Model
+f1_normal = f1_score(y_test, y_pred, average='weighted')
+print("Normal Logistic Regression - Weighted F1 Score:", f1_normal)
+print("Normal Logistic Regression - Classification Report:")
+print(classification_report(y_test, y_pred, target_names=['Politics', 'Sport', 'Technology', 'Entertainment', 'Business']))
+
+# Evaluate the Fine-Tuned Logistic Regression Model
+f1_fine_tuned = f1_score(y_test, y_pred_fine_tuned, average='weighted')
+print("\nFine-Tuned Logistic Regression - Weighted F1 Score:", f1_fine_tuned)
+print("Fine-Tuned Logistic Regression - Classification Report:")
+print(classification_report(y_test, y_pred_fine_tuned, target_names=['Politics', 'Sport', 'Technology', 'Entertainment', 'Business']))
+
 # Saving the model & Vectorizer
-joblib.dump(model, 'logistic_regression_model.pkl')
-joblib.dump(vectorizer, 'tfidf_vectorizer.pkl')
+# joblib.dump(model, 'logistic_regression_model.pkl')
+# joblib.dump(vectorizer, 'tfidf_vectorizer.pkl')
 
