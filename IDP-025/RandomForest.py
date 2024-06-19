@@ -3,15 +3,18 @@ import numpy as np
 from pathlib import Path
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report,f1_score
-from sklearn.model_selection import RandomizedSearchCV, train_test_split
-from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import RandomizedSearchCV, train_test_split, cross_val_score
+from hyperopt import hp, fmin, tpe, Trials
 import joblib
 
-current_dir=Path(__file__).resolve().parent
-dataset_path= current_dir.parent/'IDP-024' /'Non_legal_dataset.csv'
 
-dataset= pd.read_csv(dataset_path)
+current_dir = Path(__file__).resolve().parent
+dataset_path = current_dir.parent / 'Datasets' / 'Non_legal_dataset.csv'
 
+if not dataset_path.exists():
+    raise FileNotFoundError(f"Dataset not found at {dataset_path}")
+
+dataset = pd.read_csv(dataset_path)
 print(dataset.head())
 
 vectorizer=joblib.load("tfidf_vectorizer.pkl")
@@ -32,24 +35,21 @@ print("Classification report: ")
 print(classification_report(y_test,y_pred,target_names=['Politics','Sport','Technology','Entertainment','Business']))
 print("---------------------")
 
-# defining parameter range 
-param_grid = {
-    'n_estimators': [50, 100, 200],
-    'max_depth': [None, 10, 20, 30],
-    'min_samples_split': [2, 5, 10],
-    'min_samples_leaf': [1, 2, 4],
-    'max_features': ['auto', 'sqrt', 'log2']
-}
+#Checking for overfitting 
+cross_val_scores = cross_val_score(model, X, y, cv=5, scoring='f1_weighted')
+print(f'Cross-Validation F1 Score: {cross_val_scores.mean():.4f} (+/- {cross_val_scores.std():.4f})')
+print("---------------------")
 
-# Instantiate GridSearchCV
-grid_search = GridSearchCV(estimator=model, param_grid=param_grid, cv=5, n_jobs=-1)
+model2= joblib.load("RandomForest_best_hyperopt.pkl")
 
-# Fit GridSearchCV
-grid_search.fit(X, y)
+y_pred = model2.predict(X_test)
 
-# Print the best parameters found
-print("Best parameters found:")
-print(grid_search.best_params_)
+f1 = f1_score(y_test, y_pred, average='weighted')
+print(f"Weighted F1 score on test set: {f1:.4f}")
+print("---------------------")
+print("Classification Report:")
+print(classification_report(y_test, y_pred, target_names=['Politics', 'Sport', 'Technology', 'Entertainment', 'Business']))
+
 
 #Saving the model
-joblib.dump(model, 'RandomForest.pkl')
+#joblib.dump(model, 'RandomForest.pkl')
