@@ -14,7 +14,7 @@ from gridfs.errors import NoFile
 from pymongo import errors
 from django.shortcuts import redirect
 from django.http import JsonResponse
-
+from django.urls import reverse
 
 def connect_to_mongo():
     client = MongoClient(settings.DATABASES['default']['CLIENT']['host'])
@@ -101,7 +101,7 @@ def get_file_id_by_name(file_name):
         return str(e)
 
 @api_view(['GET'])
-def get_pdf_by_name(request, file_name):
+def get_pdf_by_name(file_name):
     file_id = get_file_id_by_name(file_name)
     if file_id:
         return redirect('get_pdf_by_id', file_id=file_id)
@@ -118,23 +118,26 @@ def list_files(request):
         return JsonResponse({'files': file_list})
     except errors.PyMongoError as e:
         return HttpResponse(f'Database error: {str(e)}', status=500)   
-    
+
 @api_view(['POST'])
 def handle_selected_pdfs(request):
     try:
-        data = request.data
+        data=request.data
         selected_pdfs = data.get('selectedPdfs', [])
+        if len(selected_pdfs) == 0:
+            return Response({'message': 'No PDFs selected'}, status=200)
         
-        if not isinstance(selected_pdfs, list):
-            return JsonResponse({'error': 'Invalid data format. Expected a list of filenames.'}, status=400)
+        pdf_file_ids = []
+        for pdf_name in selected_pdfs:
+            file_id = get_file_id_by_name(pdf_name)
+            if file_id:
+                pdf_file_ids.append(file_id)
+            else:
+                return Response({'error': f'File not found: {pdf_name}'}, status=404)
         
-        pdf_results = []
+        pdf_urls = [request.build_absolute_uri(reverse('get_pdf_by_id', args=[file_id])) for file_id in pdf_file_ids]
         
-        for pdf in selected_pdfs:
-            result = get_pdf_by_name(request, pdf)
-            pdf_results.append(result)
-        
-        return JsonResponse({'message': 'Successfully processed selected PDFs', 'selectedPdfs': selected_pdfs, 'results': pdf_results})
-        
+        return Response({'message': 'PDFs found', 'pdfUrls': pdf_urls})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
+        

@@ -6,6 +6,7 @@ import MultipleSelectNative from "./Select";
 import styles from "./Select.module.css";
 import { Button } from "@mui/material";
 import { useState } from "react";
+import axios from "axios";
 function BasicModal(props) {
   const handleClose = () => props.setOpen(false);
 
@@ -17,23 +18,20 @@ function BasicModal(props) {
 
   const handleViewPdf = async () => {
     try {
-      const response = await fetch(
+      const response = await axios.post(
         "http://localhost:8000/api/handle-selected-pdfs",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ selectedPdfs }),
-        }
+        { selectedPdfs }
       );
+      const pdfUrls = response.data.pdfUrls;
+      console.log("PDF URLs:", pdfUrls);
+      pdfUrls.forEach((url) => {
+        window.open(url, "_blank");
+      });
 
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      const result = await response.json();
-      console.log("Successfully sent selected PDFs to the backend:", result);
+      console.log(
+        "Successfully sent selected PDFs to the backend:",
+        response.data
+      );
     } catch (error) {
       console.error("Error sending selected PDFs to the backend:", error);
     }
