@@ -35,6 +35,7 @@ function BasicModal(props) {
     } catch (error) {
       console.error("Error sending selected PDFs to the backend:", error);
     }
+    setSelectedPdfs([]);
     handleClose();
   };
 
