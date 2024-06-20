@@ -37,6 +37,5 @@ if __name__ == "__main__":
     #link = "commonwealthvgraham.pdf"
     #Extract_Text_PDF(link)
     #url = "https://www.supremecourt.gov/pdfs/transcripts/1984/84-849_04-16-1985.pdf"
-    #url = "https://eresources.hcourt.gov.au/downloadPdf/2024/HCA/23"
-    #Extract_Text_PDF_URL(url)
-
+    url = "https://eresources.hcourt.gov.au/downloadPdf/2024/HCA/23"
+    Extract_Text_PDF_URL(url)
