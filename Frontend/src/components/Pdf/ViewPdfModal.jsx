@@ -7,6 +7,8 @@ import styles from "./Select.module.css";
 import { Button } from "@mui/material";
 import { useState } from "react";
 import axios from "axios";
+import PdfViewer from "./PdfViewer";
+//import { BrowserRouter, Route, Switch } from "react-router-dom";
 function ViewPdfModal(props) {
   const handleClose = () => props.setOpen(false);
 
@@ -25,7 +27,18 @@ function ViewPdfModal(props) {
       const pdfUrls = response.data.pdfUrls;
       console.log("PDF URLs:", pdfUrls);
       pdfUrls.forEach((url) => {
+        console.log("Opening PDF:", url);
         window.open(url, "_blank");
+        //window.open(<PdfViewer fileUrl={url} />, "_blank");
+        // <div>
+        //   <div>
+        //     <Switch>
+        //       <Route path={"/" + url}>
+        //         <PdfViewer fileUrl={url} />
+        //       </Route>
+        //     </Switch>
+        //   </div>
+        // </div>;
       });
 
       console.log(

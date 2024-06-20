@@ -134,3 +134,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 CORS_ALLOW_ALL_ORIGINS = True # to allow HTTP requests from a different origin (react app)
+
+X_FRAME_OPTIONS = 'localhost:5173'
