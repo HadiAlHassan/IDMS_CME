@@ -7,43 +7,41 @@ import styles from "./Select.module.css";
 import { Button } from "@mui/material";
 import { useState } from "react";
 import axios from "axios";
-import PdfViewer from "./PdfViewer";
-//import { BrowserRouter, Route, Switch } from "react-router-dom";
 function ViewPdfModal(props) {
   const handleClose = () => props.setOpen(false);
 
   const [selectedPdfs, setSelectedPdfs] = useState([]);
 
   const handleSelectionChange = (newSelection) => {
+    console.log("New selection:", newSelection);
     setSelectedPdfs(newSelection); // Directly set the state with the current selection
   };
 
   const handleViewPdf = async () => {
     try {
-      const response = await axios.post(
+      const response_pdf = await axios.post(
         "http://localhost:8000/api/handle-selected-pdfs",
         { selectedPdfs }
       );
-      const pdfUrls = response.data.pdfUrls;
+      const response_metadata = await axios.post(
+        "http://localhost:8000/api/get_metadata_by_pdf_name",
+        { selectedPdfs }
+      );
+      const pdfUrls = response_pdf.data.pdfUrls;
+      const metadata = response_metadata.data.pdf_metadata;
+      console.log("Metadata:", metadata);
       console.log("PDF URLs:", pdfUrls);
-      pdfUrls.forEach((url) => {
-        console.log("Opening PDF:", url);
-        window.open(url, "_blank");
-        //window.open(<PdfViewer fileUrl={url} />, "_blank");
-        // <div>
-        //   <div>
-        //     <Switch>
-        //       <Route path={"/" + url}>
-        //         <PdfViewer fileUrl={url} />
-        //       </Route>
-        //     </Switch>
-        //   </div>
-        // </div>;
+      pdfUrls.forEach((url, index) => {
+        // Open a new tab for each PDF URL using the PdfViewer component
+        const viewerUrl = `/view-pdf?url=${encodeURIComponent(
+          url
+        )}&metadata=${encodeURIComponent(JSON.stringify(metadata[index]))}`;
+        window.open(viewerUrl, "_blank");
       });
 
       console.log(
         "Successfully sent selected PDFs to the backend:",
-        response.data
+        response_pdf.data
       );
     } catch (error) {
       console.error("Error sending selected PDFs to the backend:", error);

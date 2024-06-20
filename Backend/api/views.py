@@ -21,27 +21,8 @@ def connect_to_mongo():
     db = client[settings.DATABASES['default']['NAME']]
     return db
 
-@api_view(['GET'])
-def view_docs(request):
-    try:
-        start_date = request.GET.get('start_date')
-        end_date = request.GET.get('end_date')
 
-        if not start_date:
-            start_date = datetime.now() - timedelta(weeks=2)
-        else:
-            start_date = datetime.strptime(start_date, '%Y-%m-%d')
 
-        if not end_date:
-            end_date = datetime.now()
-        else:
-            end_date = datetime.strptime(end_date, '%Y-%m-%d')
-
-        docs = DocGeneralInfo.objects.filter(date_submitted__gte=start_date, date_submitted__lt=end_date)
-        serializer = DocGeneralInfoSerializer(docs, many=True)
-        return Response(serializer.data)
-    except Exception as e:
-        return Response({'error': str(e)}, status=400)
 
 @api_view(['POST'])
 def add_doc(request):
@@ -153,4 +134,23 @@ def handle_selected_pdfs(request):
         return Response({'message': 'PDFs found', 'pdfUrls': pdf_urls})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
-        
+    
+def view_docs(pdf_title):
+    docs = DocGeneralInfo.objects.filter(title__icontains=pdf_title)
+    serializer = DocGeneralInfoSerializer(docs, many=True)
+    return serializer.data
+
+@api_view(['POST'])
+def get_metadata_by_pdf_name(request):
+    try:
+        data=request.data
+        selected_pdfs = data.get('selectedPdfs')
+        L =[]
+        if len(selected_pdfs) == 0:
+            return Response({'message': 'No PDFs '}, status=200)
+        result_list = []
+        for pdf_name in selected_pdfs:
+            result_list.extend(view_docs(pdf_name))
+        return Response({'message': 'PDFs found', 'pdf_metadata': result_list})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
