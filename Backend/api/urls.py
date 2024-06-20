@@ -10,4 +10,5 @@ urlpatterns = [
     path('list-files/', views.list_files, name='list_files'),
     path('handle-selected-pdfs', views.handle_selected_pdfs, name='handle_selected_pdfs'),
     path('get_metadata_by_pdf_name', views.get_metadata_by_pdf_name, name='get_metadata_by_pdf_name'),
+    path('scrape-website', views.scrape_website, name='scrape_website'),
 ]

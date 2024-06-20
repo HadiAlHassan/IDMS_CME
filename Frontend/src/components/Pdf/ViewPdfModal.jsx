@@ -9,7 +9,6 @@ import { useState } from "react";
 import axios from "axios";
 function ViewPdfModal(props) {
   const handleClose = () => props.setOpen(false);
-
   const [selectedPdfs, setSelectedPdfs] = useState([]);
 
   const handleSelectionChange = (newSelection) => {

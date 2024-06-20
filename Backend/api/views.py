@@ -21,9 +21,6 @@ def connect_to_mongo():
     db = client[settings.DATABASES['default']['NAME']]
     return db
 
-
-
-
 @api_view(['POST'])
 def add_doc(request):
     try:
@@ -154,3 +151,14 @@ def get_metadata_by_pdf_name(request):
         return Response({'message': 'PDFs found', 'pdf_metadata': result_list})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
+    
+@api_view(['POST'])
+def scrape_website(request):
+    url = request.data.get('url')
+    if not url:
+        return Response({'error': 'No URL provided'}, status=400)   
+    try:
+        #Scrape the website
+        return Response({'message': 'Website scraped successfully'})
+    except Exception as e:
+        return Response({'error': str(e)}, status=400)
