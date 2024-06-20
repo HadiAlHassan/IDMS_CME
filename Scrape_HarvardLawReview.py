@@ -31,7 +31,7 @@ def extract_content_HarvardReview(soup):
 
 #save into TXT file format
 def save_content(title,content):
-    filename = f"{title}.txt".replace(" ", "_").replace(":", "").replace("/", "_")
+    filename = f"{title}.txt".replace(" ", "_").replace(":", "").replace("/", "_").replace("\n"," ").replace("\r"," ")
 
     try:
         with open(filename, "w", encoding='utf-8') as file:
