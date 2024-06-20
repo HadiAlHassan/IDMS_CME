@@ -32,7 +32,7 @@ def extract_content_googleScholar(soup):
 
 #save into TXT file format
 def save_content(title,content):
-    filename = f"{title}.txt".replace(" ", "_").replace(":", "").replace("/", "_").replace("\n"," ").replace("\r"," ")
+    filename = f"{title}.txt".replace(":", "").replace("/", "_").replace("\n"," ").replace("\r"," ").replace(" ", "_")
 
     try:
         with open(filename, "w", encoding='utf-8') as file:
