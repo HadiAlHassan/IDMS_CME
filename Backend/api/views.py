@@ -15,6 +15,8 @@ from pymongo import errors
 from django.shortcuts import redirect
 from django.http import JsonResponse
 from django.urls import reverse
+from WebScraping.Scraper import Scraper
+
 
 def connect_to_mongo():
     client = MongoClient(settings.DATABASES['default']['CLIENT']['host'])
@@ -158,7 +160,8 @@ def scrape_website(request):
     if not url:
         return Response({'error': 'No URL provided'}, status=400)   
     try:
-        #Scrape the website
+        scraper = Scraper()
+        scraper.Scrape(url)
         return Response({'message': 'Website scraped successfully'})
     except Exception as e:
         return Response({'error': str(e)}, status=400)
