@@ -31,8 +31,6 @@ def Extract_Text_PDF_URL(url):
         out.close() # close the output file
         return
 
-
-
 if __name__ == "__main__":
     #link = "commonwealthvgraham.pdf"
     #Extract_Text_PDF(link)
