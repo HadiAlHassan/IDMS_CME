@@ -1,7 +1,6 @@
 from enum import Enum
 import requests
 from bs4 import BeautifulSoup
-import selenium
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
@@ -251,6 +250,6 @@ class Scraper:
 
 
 if __name__=="__main__":
-    scrapy = Scraper()
+    scrpay = Scraper()
     url = input()
-    scrapy.Scrape(url)
+    scrpay.Scrape(url)

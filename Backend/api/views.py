@@ -15,7 +15,7 @@ from pymongo import errors
 from django.shortcuts import redirect
 from django.http import JsonResponse
 from django.urls import reverse
-
+from .Scraper import Scraper
 def connect_to_mongo():
     client = MongoClient(settings.DATABASES['default']['CLIENT']['host'])
     db = client[settings.DATABASES['default']['NAME']]
@@ -153,4 +153,13 @@ def handle_selected_pdfs(request):
         return Response({'message': 'PDFs found', 'pdfUrls': pdf_urls})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
-        
+    
+@api_view(['POST'])
+def scrape_url(request):
+    try:
+        scraper = Scraper()
+        url = request.data.get('url')
+        scraper.Scrape(url)
+        return Response({'message': 'URL scraped successfully'})
+    except Exception as e:
+        return Response({'error': str(e)}, status=400)

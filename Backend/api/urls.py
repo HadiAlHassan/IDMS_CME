@@ -9,4 +9,5 @@ urlpatterns = [
     path('get-pdf-by-name/<str:file_name>/', views.get_pdf_by_name, name='get_pdf_by_name'),
     path('list-files/', views.list_files, name='list_files'),
     path('handle-selected-pdfs', views.handle_selected_pdfs, name='handle_selected_pdfs'),
+    path('scrape-url/', views.scrape_url, name='scrape_url'),
 ]
