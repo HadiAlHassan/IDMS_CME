@@ -6,7 +6,10 @@ from sklearn.metrics import classification_report,f1_score
 from sklearn.model_selection import RandomizedSearchCV, train_test_split, cross_val_score
 from hyperopt import hp, fmin, tpe, Trials
 import joblib
-
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+import re
+from nltk.tokenize import word_tokenize
 
 current_dir = Path(__file__).resolve().parent
 dataset_path = current_dir.parent / 'Datasets' / 'Legal_Non_Legal_Dataset.csv'
@@ -19,8 +22,28 @@ print(dataset.head())
 
 vectorizer=joblib.load("tfidf_vectorizer.pkl")
 
-X=vectorizer.fit_transform(dataset["Text"])
-y=dataset["Label"]
+lemmatizer = WordNetLemmatizer()
+def preprocess_text(text):
+    # Convert text to lowercase and remove non-alphanumeric characters
+    text = text.lower()
+    text = re.sub(r'[^\w\s]', '', text)
+    
+    # Tokenize text into words
+    words = word_tokenize(text)
+    stop_words= set(stopwords.words("english"))
+    # Remove stopwords and lemmatize words
+    lemmatized_words = []
+    for word in words:
+        if word not in stop_words:
+            lemma = lemmatizer.lemmatize(word)
+            lemmatized_words.append(lemma)
+    
+    return ' '.join(lemmatized_words)
+
+dataset['clean_text'] = dataset['text'].apply(preprocess_text) 
+
+X=vectorizer.fit_transform(dataset["clean_text"])
+y=dataset["label"]
 
 X_train,X_test, y_train, y_test= train_test_split(X,y,test_size=0.2,random_state=42)
 
