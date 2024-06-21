@@ -9,7 +9,7 @@ The process of scraping is done with one of Three ways here:
 ------------------------------------------------------------------------------------------------------------------------------
 ## Prerequisutes to Use the Scraper.py File.
 
-pip install the requirements.TXT file (Mainly selenium Beautifulsoup4 requests lxml )
+pip install the requirements.TXT file (Mainly selenium Beautifulsoup4 requests lxml and pymupdf)
 
 For selenium you must install the suitable chrome driver (more details here https://pypi.org/project/selenium/)
 ------------------------------------------------------------------------------------------------------------------------------
