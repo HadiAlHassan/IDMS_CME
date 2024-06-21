@@ -6,9 +6,11 @@ import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import { Button } from "@mui/material";
 import axios from "axios";
+import SuccessAlerts from "../Alert/Success";
 
 function WsModal(props) {
   const handleClose = () => props.setOpen(false);
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   function handleScrape() {
     console.log(
       "Scraping website:",
@@ -21,12 +23,15 @@ function WsModal(props) {
 
       .then((response) => {
         console.log("Scraped website:", response.data);
+        setShowSuccessAlert(true);
+        setTimeout(() => setShowSuccessAlert(false), 5000);
       })
       .catch((error) => {
         console.error("Error scraping website:", error);
       });
     handleClose();
   }
+
   return (
     <div>
       <Modal
@@ -58,6 +63,11 @@ function WsModal(props) {
           </Button>
         </form>
       </Modal>
+      <SuccessAlerts
+        open={showSuccessAlert}
+        message="Website scraped successfully"
+        onClose={() => setShowSuccessAlert(false)}
+      />
     </div>
   );
 }

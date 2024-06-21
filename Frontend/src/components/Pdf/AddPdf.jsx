@@ -1,7 +1,12 @@
 import { Button } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import classes from "./AddPdf.module.css";
+import SuccessAlerts from "../Alert/Success";
+import { useState } from "react";
+
 function AddPdf() {
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+
   function clickHandler() {
     const fileInput = document.createElement("input");
     fileInput.type = "file";
@@ -22,6 +27,8 @@ function AddPdf() {
       });
       const result = await response.json();
       console.log("Server response:", result);
+      setShowSuccessAlert(true);
+      setTimeout(() => setShowSuccessAlert(false), 5000);
     } catch (error) {
       console.error("Error uploading file:", error);
     }
@@ -29,7 +36,7 @@ function AddPdf() {
   }
 
   return (
-    <div>
+    <div className={classes.container}>
       <Button
         className={classes.button}
         variant="contained"
@@ -38,6 +45,11 @@ function AddPdf() {
       >
         Add PDF
       </Button>
+      <SuccessAlerts
+        open={showSuccessAlert}
+        message="PDF uploaded successfully"
+        onClose={() => setShowSuccessAlert(false)}
+      />
     </div>
   );
 }
