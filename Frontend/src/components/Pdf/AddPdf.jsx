@@ -26,9 +26,13 @@ function AddPdf() {
         body: formData,
       });
       const result = await response.json();
-      console.log("Server response:", result);
-      setShowSuccessAlert(true);
-      setTimeout(() => setShowSuccessAlert(false), 5000);
+      if (response.ok) {
+        console.log("Server response:", result);
+        setShowSuccessAlert(true);
+        setTimeout(() => setShowSuccessAlert(false), 5000);
+      } else {
+        console.error("Server error:", result);
+      }
     } catch (error) {
       console.error("Error uploading file:", error);
     }
