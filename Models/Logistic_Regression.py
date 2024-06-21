@@ -5,7 +5,13 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import ConfusionMatrixDisplay, classification_report, f1_score, confusion_matrix
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+from nltk.stem import PorterStemmer
+from nltk.tokenize import word_tokenize
 import joblib
+import nltk
+import re
 
 current_dir = Path(__file__).resolve().parent
 dataset_path = current_dir.parent / 'Datasets' / 'Legal_Non_Legal_Dataset.csv'
@@ -15,10 +21,33 @@ if not dataset_path.is_file():
 else:
     dataset = pd.read_csv(dataset_path)
 
+stop_words= set(stopwords.words("english"))
+ps=PorterStemmer()
+lemmatizer = WordNetLemmatizer() 
+def preprocess_text(text):
+    # Convert text to lowercase and remove non-alphanumeric characters
+    text = text.lower()
+    text = re.sub(r'[^\w\s]', '', text)
+    
+    # Tokenize text into words
+    words = word_tokenize(text)
+    
+    # Remove stopwords and lemmatize words
+    lemmatized_words = []
+    for word in words:
+        if word not in stop_words:
+            lemma = lemmatizer.lemmatize(word)
+            lemmatized_words.append(lemma)
+    
+    return ' '.join(lemmatized_words)
+
+dataset['clean_text'] = dataset['text'].apply(preprocess_text)    
+
+
 print(dataset.head())
 
 vectorizer = TfidfVectorizer(stop_words='english', max_features=1000)
-X = vectorizer.fit_transform(dataset['text'])
+X = vectorizer.fit_transform(dataset['clean_text'])
 y = dataset['label']
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)

@@ -21,7 +21,9 @@ from pathlib import Path
 
 current_dir = Path(__file__).resolve().parent
 dataset_path = current_dir.parent / 'Datasets' / 'Legal_Non_Legal_dataset.csv'
-
+nltk.download('stopwords')
+nltk.download('punkt')
+nltk.download('wordnet')
 if not dataset_path.is_file():
     print(f"File not found: {dataset_path}")
 else:

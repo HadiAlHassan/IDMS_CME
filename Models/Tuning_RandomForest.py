@@ -10,6 +10,10 @@ from imblearn.under_sampling import RandomUnderSampler
 from imblearn.pipeline import Pipeline
 from hyperopt import hp, fmin, tpe, Trials
 import joblib
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+import re
+from nltk.tokenize import word_tokenize
 
 # Load the dataset
 current_dir = Path(__file__).resolve().parent
@@ -24,12 +28,34 @@ print(dataset.head())
 # Load the pre-trained vectorizer
 vectorizer = joblib.load("tfidf_vectorizer.pkl")  
 
+
+stop_words= set(stopwords.words("english"))
+lemmatizer = WordNetLemmatizer() 
+def preprocess_text(text):
+    # Convert text to lowercase and remove non-alphanumeric characters
+    text = text.lower()
+    text = re.sub(r'[^\w\s]', '', text)
+    
+    # Tokenize text into words
+    words = word_tokenize(text)
+    
+    # Remove stopwords and lemmatize words
+    lemmatized_words = []
+    for word in words:
+        if word not in stop_words:
+            lemma = lemmatizer.lemmatize(word)
+            lemmatized_words.append(lemma)
+    
+    return ' '.join(lemmatized_words)
+
+dataset['clean_text'] = dataset['text'].apply(preprocess_text)    
+
 # Transform the text data
-X = vectorizer.transform(dataset["text"])
+X = vectorizer.transform(dataset["clean_text"])
 y = dataset["label"]
 
 # Split the data into train and test sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5, random_state=42)
 
 # Address class imbalance using a combination of SMOTE and RandomUnderSampler
 over_sampler = SMOTE(sampling_strategy='minority', random_state=42)

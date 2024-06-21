@@ -6,6 +6,10 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import classification_report, f1_score
 from hyperopt import hp, fmin, tpe, Trials
 import joblib
+from nltk.tokenize import word_tokenize
+import re
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
 
 # Define current directory and dataset path
 current_dir = Path(__file__).resolve().parent
@@ -20,9 +24,28 @@ print(dataset.head())
 
 # Load the pre-trained TF-IDF vectorizer
 vectorizer = joblib.load("tfidf_vectorizer.pkl")
+lemmatizer = WordNetLemmatizer()
+def preprocess_text(text):
+    # Convert text to lowercase and remove non-alphanumeric characters
+    text = text.lower()
+    text = re.sub(r'[^\w\s]', '', text)
+    
+    # Tokenize text into words
+    words = word_tokenize(text)
+    stop_words= set(stopwords.words("english"))
+    # Remove stopwords and lemmatize words
+    lemmatized_words = []
+    for word in words:
+        if word not in stop_words:
+            lemma = lemmatizer.lemmatize(word)
+            lemmatized_words.append(lemma)
+    
+    return ' '.join(lemmatized_words)
+
+dataset['clean_text'] = dataset['text'].apply(preprocess_text) 
 
 # Transform the text data
-X = vectorizer.transform(dataset['text'])
+X = vectorizer.transform(dataset['clean_text'])
 y = dataset['label']
 
 # Define the search space for hyperparameters

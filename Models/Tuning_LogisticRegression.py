@@ -7,6 +7,10 @@ from hyperopt import hp, fmin, tpe, Trials
 import joblib
 from pathlib import Path
 from sklearn.linear_model import LogisticRegression
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+import re
+from nltk.tokenize import word_tokenize
 
 # Define current directory and dataset path
 current_dir = Path(__file__).resolve().parent
@@ -22,7 +26,31 @@ dataset = pd.read_csv(dataset_path)
 vectorizer = joblib.load("tfidf_vectorizer.pkl")
 
 # Transform the text data
-X = vectorizer.transform(dataset["text"])
+
+stop_words= set(stopwords.words("english"))
+
+lemmatizer = WordNetLemmatizer() 
+def preprocess_text(text):
+    # Convert text to lowercase and remove non-alphanumeric characters
+    text = text.lower()
+    text = re.sub(r'[^\w\s]', '', text)
+    
+    # Tokenize text into words
+    words = word_tokenize(text)
+    
+    # Remove stopwords and lemmatize words
+    lemmatized_words = []
+    for word in words:
+        if word not in stop_words:
+            lemma = lemmatizer.lemmatize(word)
+            lemmatized_words.append(lemma)
+    
+    return ' '.join(lemmatized_words)
+
+dataset['clean_text'] = dataset['text'].apply(preprocess_text) 
+
+
+X = vectorizer.transform(dataset["clean_text"])
 y = dataset["label"]
 
 # Split the data into training and test sets
