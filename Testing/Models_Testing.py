@@ -53,7 +53,7 @@ def classify_text_NaiveBayesHyperopt(text):
     return prediction[0]
 
 current_dir=Path(__file__).resolve().parent
-text_file_path= current_dir.parent/ 'TestingTxtFiles' / 'LegalTest1.txt'
+text_file_path= current_dir.parent/ 'TestingTxtFiles' / 'TestCase5.txt'
 
 with open(text_file_path,'r',encoding='utf-8') as file:
     new_text=file.read()
