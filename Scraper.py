@@ -12,7 +12,6 @@ import pyperclip
 import time  
 import pymupdf
 #--------------------------------------------------------------------------------------------#
-
 class Source(Enum):
     HarvardLawReview = 1
     GoogleScholar = 2
