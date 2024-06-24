@@ -66,7 +66,7 @@ def get_pdf_by_name(file_name):
 
 @timing_decorator
 @api_view(['GET', 'POST'])
-def list_pdfs():
+def list_pdfs(request):
     try:
         db = connect_to_mongo()
         files_collection = db['general_info']
