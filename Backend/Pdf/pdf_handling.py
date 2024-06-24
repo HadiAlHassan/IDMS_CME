@@ -5,10 +5,9 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from bson.objectid import ObjectId
 from pymongo import errors as pymongo_errors
-from gridfs import GridFS
 
 
-from Utils.db import connect_to_mongo 
+from Utils.db import connect_to_mongo, connect_to_gridfs
 from Utils.helper_functions import get_file_id_by_name, get_metadata
 from api.serializers import DocGeneralInfoSerializer
 from Utils.decorators import timing_decorator
@@ -21,8 +20,7 @@ def add_pdf(request):
         if not pdf_file:
             return Response({'error': 'No PDF file provided'}, status=400)
 
-        db = connect_to_mongo()
-        fs = GridFS(db)
+        fs = connect_to_gridfs()
               
         existing_file = fs.find_one({'filename': pdf_file.name})
         if existing_file:
@@ -48,8 +46,7 @@ def get_pdf_by_id(request, file_id):
     try:
         if not ObjectId.is_valid(file_id):
             return HttpResponse('Invalid file ID', status=400)
-        db = connect_to_mongo()
-        fs = GridFS(db)
+        fs = connect_to_gridfs()
         
         file = fs.get(ObjectId(file_id))  # Corrected "Objectid" to "ObjectId"
         response = HttpResponse(file.read(), content_type='application/pdf')

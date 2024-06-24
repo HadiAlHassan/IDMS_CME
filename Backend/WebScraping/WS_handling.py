@@ -12,7 +12,7 @@ def scrape_website(request):
         return Response({'error': 'No URL provided'}, status=400)   
     try:
         scraper = Scraper()
-        scraper.Scrape(url)
+        scraper.scrape(url)
         return Response({'message': 'Website scraped successfully'})
     except Exception as e:
         return Response({'error': str(e)}, status=400)
