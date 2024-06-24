@@ -3,9 +3,9 @@ import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
-import classes from "./Success.module.css";
+import classes from "./Error.module.css";
 
-function SuccessAlerts({ message, onClose, open }) {
+function ErrorAlerts({ message, onClose, open }) {
   return (
     <Snackbar
       open={open}
@@ -15,7 +15,7 @@ function SuccessAlerts({ message, onClose, open }) {
     >
       <Alert
         onClose={onClose}
-        severity="success"
+        severity="error"
         variant="filled"
         className={classes.alert}
         action={
@@ -35,4 +35,4 @@ function SuccessAlerts({ message, onClose, open }) {
   );
 }
 
-export default SuccessAlerts;
+export default ErrorAlerts;
