@@ -9,6 +9,7 @@ The required packages include:
 - requests
 - lxml
 - pymupdf
+- pyperclip  
 
 For Selenium, you must install the suitable Chrome driver. More details can be found [here](https://pypi.org/project/selenium/).
 
