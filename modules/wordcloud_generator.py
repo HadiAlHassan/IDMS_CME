@@ -60,8 +60,8 @@ def generate_word_cloud_from_file(file):
 if __name__ == "__main__":
     from pathlib import Path
 
-    # Path to the text file
-    file_path = Path(__file__).resolve().parent.parent / 'txtfiles' / 'englishtest11.txt'
+    
+    file_path = Path(__file__).resolve().parent.parent / 'txtfiles' / 'testcase0.txt'
 
     with open(file_path, 'r', encoding='utf-8') as file:
         output_path = generate_word_cloud_from_file(file)
