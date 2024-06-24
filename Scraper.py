@@ -12,7 +12,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.service import Service as ChromeService
 
-class Domain_Source(Enum):
+class DomainSource(Enum):
     HarvardLawReview = 1
     GoogleScholar = 2
     LegiFrance = 3
@@ -31,7 +31,7 @@ class Scraper:
         self.url_mapper = {
 
 
-            Domain_Source.HarvardLawReview : {
+            DomainSource.HarvardLawReview : {
 
                 "url" : "https://harvardlawreview.org/",
                 "method" : self.__scrape_webpage,
@@ -41,7 +41,7 @@ class Scraper:
                 }
             },
 
-            Domain_Source.GoogleScholar : {
+            DomainSource.GoogleScholar : {
 
                 "url" : "https://scholar.google.com/",
                 "method" :  self.__scrape_webpage,
@@ -52,14 +52,14 @@ class Scraper:
             },
 
 
-            Domain_Source.LegiFrance : {
+            DomainSource.LegiFrance : {
 
                 "url" : "https://www.legifrance.gouv.fr/",
                 "method" : self.__scrape_legifrance,
                 "tags": {}  
             },
 
-            Domain_Source.CourtListener : {
+            DomainSource.CourtListener : {
 
                 "url" : "https://www.courtlistener.com/",
                 "method" : self.__scrape_webpage,
@@ -69,14 +69,14 @@ class Scraper:
                 }
             },
 
-            Domain_Source.UsSupremeCourt : {
+            DomainSource.UsSupremeCourt : {
 
                 "url" : "https://www.supremecourt.gov/",
                 "method" : self.__extract_text_from_pdf,
                 "tags": {}  # Not Needed, They are in PDF Format
             },
 
-            Domain_Source.HighCourtOfAustralia : {
+            DomainSource.HighCourtOfAustralia : {
 
                 "url" : "https://www.hcourt.gov.au/",
                 "method" : self.__extract_text_from_pdf,
