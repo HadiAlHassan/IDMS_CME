@@ -42,7 +42,7 @@ def add_pdf(request):
 
 @timing_decorator 
 @api_view(['GET'])
-def get_pdf_by_id(request, file_id):
+def get_pdf_by_id(file_id):
     try:
         if not ObjectId.is_valid(file_id):
             return HttpResponse('Invalid file ID', status=400)
@@ -66,15 +66,15 @@ def get_pdf_by_name(file_name):
 
 @timing_decorator
 @api_view(['GET', 'POST'])
-def list_files(request):
+def list_pdfs():
     try:
         db = connect_to_mongo()
-        files_collection = db['fs.files']
-        files = files_collection.find({}, {'filename': 1}) 
-        file_list = [{'name': file['filename']} for file in files] 
+        files_collection = db['general_info']
+        files = files_collection.find({}, {'title': 1, 'source': 1})  # Include 'source' in the projection
+        file_list = [{'name': file['title']} for file in files if file['source'] == "PDF"]
         return JsonResponse({'files': file_list})
     except pymongo_errors.PyMongoError as e:
-        return HttpResponse(f'Database error: {str(e)}', status=500)     
+        return HttpResponse(f'Database error: {str(e)}', status=500)   
 
 @timing_decorator     
 @api_view(['POST'])

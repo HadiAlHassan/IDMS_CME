@@ -11,7 +11,7 @@ function MultipleSelectNative(props) {
   useEffect(() => {
     const fetchPdfs = async () => {
       try {
-        const response = await fetch("http://localhost:8000/api/list-files/");
+        const response = await fetch("http://localhost:8000/api/list-pdfs/");
         const data = await response.json();
         if (Array.isArray(data.files)) {
           const pdfNames = data.files.map((pdf) => pdf.name);
