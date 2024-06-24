@@ -34,7 +34,7 @@ class Scraper:
             Domain_Source.HarvardLawReview : {
 
                 "url" : "https://harvardlawreview.org/",
-                "method" : self.scrape_webpage,
+                "method" : self.__scrape_webpage,
                 "tags": {
                     "title": {"tag": "h1", "class": "single-article__title"},
                     "content": {"tag": "div", "class": "entry-content"}
@@ -44,7 +44,7 @@ class Scraper:
             Domain_Source.GoogleScholar : {
 
                 "url" : "https://scholar.google.com/",
-                "method" :  self.scrape_webpage,
+                "method" :  self.__scrape_webpage,
                  "tags": {
                     "title": {"tag": "h3", "id": "gsl_case_name"},
                     "content": {"tag": "div", "id": "gs_opinion_wrapper"}
@@ -62,7 +62,7 @@ class Scraper:
             Domain_Source.CourtListener : {
 
                 "url" : "https://www.courtlistener.com/",
-                "method" : self.scrape_webpage,
+                "method" : self.__scrape_webpage,
                 "tags": {
                     "title": {"tag": "h1", "class":""}, 
                     "content": {"tag": "div", "class": "serif-text"}
@@ -98,7 +98,7 @@ class Scraper:
             
         return None
     
-    def get_soup(self, url, headers):
+    def __get_soup(self, url, headers):
         try:
             page = requests.get(url, headers=headers)
             page.raise_for_status()
@@ -108,7 +108,7 @@ class Scraper:
             print("HTTP error occurred: ", e)
             return None
 
-    def save_content(self, title, content):
+    def __save_content(self, title, content):
 
         filename = f"{title}.txt"
 
@@ -122,7 +122,7 @@ class Scraper:
         except IOError as e:
             print(f"Error saving content to {filtered_filename}: {e}")
 
-    def extract_webpage_content(self, soup, tags):
+    def __extract_webpage_content(self, soup, tags):
         
         title_tag = soup.find(tags['title']['tag'], class_= tags['title'].get('class'), id = tags['title'].get('id'))
         content_tag = soup.find(tags['content']['tag'], class_ = tags['content'].get('class'), id = tags['content'].get('id'))
@@ -135,20 +135,20 @@ class Scraper:
             print("Could not find the title or content on the page.")
             return None, None
 
-    def scrape_webpage(self, url):
+    def __scrape_webpage(self, url):
 
         domain_source = self.determine_domain_source(url)
 
-        soup = self.get_soup(url, headers=self.headers)
+        soup = self.__get_soup(url, headers=self.headers)
 
         if soup:
 
             tags = self.url_mapper[domain_source]["tags"]
 
-            title, content = self.extract_webpage_content(soup, tags)
+            title, content = self.__extract_webpage_content(soup, tags)
 
             if title and content:
-                self.save_content(title, content)  
+                self.__save_content(title, content)  
 
     def __extract_text_from_pdf(self, url):
         try:
@@ -184,7 +184,7 @@ class Scraper:
             # Get the title of the document
             title = driver.find_element(By.XPATH, "/html/body/div[1]/div/main/div/div/div[2]/h1").text
             
-            self.save_content(title, copied_text)
+            self.__save_content(title, copied_text)
 
         except Exception as e:
             print(f"An error occurred: {e}")
