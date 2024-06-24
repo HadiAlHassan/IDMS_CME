@@ -1,7 +1,8 @@
-from WebScraping.Scraper import Scraper
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+
 from Utils.decorators import timing_decorator
+from WebScraping.Scraper import Scraper
 
 @timing_decorator
 @api_view(['POST'])
