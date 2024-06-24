@@ -15,7 +15,7 @@ def preprocess_text(text):
     # Convert the tokens to lower case
     tokens = [word.lower() for word in tokens]
 
-    # Remove stop words
+    # Remove all stop words
     stop_words = set(stopwords.words('english'))
     tokens = [word for word in tokens if word.isalnum() and word not in stop_words]
 
@@ -56,13 +56,12 @@ def generate_word_cloud_from_file(file):
 
     return output_path
 
-# Testing the function
-if __name__ == "__main__":
-    from pathlib import Path
+# # Testing the function
+# if __name__ == "__main__":
+#     from pathlib import Path
 
-    
-    file_path = Path(__file__).resolve().parent.parent / 'txtfiles' / 'testcase0.txt'
+#     file_path = Path(__file__).resolve().parent.parent / 'txtfiles' / 'testcase0.txt'
 
-    with open(file_path, 'r', encoding='utf-8') as file:
-        output_path = generate_word_cloud_from_file(file)
-        print(f"Word cloud saved to {output_path}")
+#     with open(file_path, 'r', encoding='utf-8') as file:
+#         output_path = generate_word_cloud_from_file(file)
+#         print(f"Word cloud saved to {output_path}")
