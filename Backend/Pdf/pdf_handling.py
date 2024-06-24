@@ -19,7 +19,9 @@ def add_pdf(request):
         pdf_file = request.FILES.get('file')
         if not pdf_file:
             return Response({'error': 'No PDF file provided'}, status=400)
-
+        
+        if not pdf_file.name.endswith('.pdf'):
+            return Response({'error': 'Invalid file type'}, status=400)
         fs = connect_to_gridfs()
               
         existing_file = fs.find_one({'filename': pdf_file.name})

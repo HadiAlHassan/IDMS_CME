@@ -7,10 +7,13 @@ import CloseIcon from "@mui/icons-material/Close";
 import { Button } from "@mui/material";
 import axios from "axios";
 import SuccessAlerts from "../Alert/Success";
+import ErrorAlerts from "../Alert/Error";
 
 function WsModal(props) {
   const handleClose = () => props.setOpen(false);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   function handleScrape() {
     console.log(
       "Scraping website:",
@@ -28,6 +31,11 @@ function WsModal(props) {
       })
       .catch((error) => {
         console.error("Error scraping website:", error);
+        setShowErrorAlert(true);
+        setErrorMessage(
+          error.response?.data?.error || "Error scraping website"
+        );
+        setTimeout(() => setShowErrorAlert(false), 5000);
       });
     handleClose();
   }
@@ -67,6 +75,11 @@ function WsModal(props) {
         open={showSuccessAlert}
         message="Website scraped successfully"
         onClose={() => setShowSuccessAlert(false)}
+      />
+      <ErrorAlerts
+        open={showErrorAlert}
+        message={errorMessage}
+        onClose={() => setShowErrorAlert(false)}
       />
     </div>
   );
