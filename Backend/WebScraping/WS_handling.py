@@ -9,11 +9,13 @@ from WebScraping.Scraper import Scraper
 def scrape_website(request):
     url = request.data.get('url')
     if not url:
-        return Response({'error': 'No URL provided'}, status=400)   
+        return Response({'error': 'No URL provided'}, status=400)       
     try:
         scraper = Scraper()
-        scraper.scrape(url)
-        return Response({'message': 'Website scraped successfully'})
+        if not scraper.scrape(url):
+            return Response({'error':"Wesbite didn't scraped, because it's already in the database"}, status=400)
+        
+        return Response({'message': 'Website scraped successfully'}, status=200)
     except Exception as e:
         return Response({'error': str(e)}, status=400)
 

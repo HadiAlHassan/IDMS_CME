@@ -269,6 +269,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.service import Service as ChromeService
 from pymongo import MongoClient
 from gridfs import GridFS
+from rest_framework.response import Response
 
 from Utils.db import connect_to_gridfs
 from api.serializers import DocGeneralInfoSerializer
@@ -373,17 +374,23 @@ class Scraper:
     def __save_to_mongo(self, title, content, url):
         try:
             fs = connect_to_gridfs()
+
             filename = f"{title}.txt"
             filtered_filename = filename.replace(":", "").replace("/", "_").replace("\n"," ").replace("\r"," ")
+
+            existing_website = fs.find_one({'filename': filtered_filename})
+            if existing_website:
+                return False
+            
             file_id = fs.put(content.encode('utf-8'), filename=filtered_filename)
 
             serializer = DocGeneralInfoSerializer(data={'source': url , 'title': filtered_filename, 'author': 'Ahmad'})
             if serializer.is_valid():
                 serializer.save()
-            print(f"Content saved to MongoDB with file ID: {file_id}")
+            return True   
 
         except Exception as e:
-            print(f"Error saving content to MongoDB: {e}")
+            return False
 
     def __extract_webpage_content(self, soup, tags):
         
@@ -411,7 +418,9 @@ class Scraper:
             title, content = self.__extract_webpage_content(soup, tags)
 
             if title and content:
-                self.__save_to_mongo(title, content, url)  
+                if not self.__save_to_mongo(title, content, url) :
+                    return False
+                return True
 
 
     def __extract_text_from_pdf(self, url):
@@ -429,7 +438,9 @@ class Scraper:
 
             title = url.split('/')[-1]
 
-            self.__save_to_mongo(title, content, url)
+            if not self.__save_to_mongo(title, content, url):
+                return False
+            return True
 
         except Exception as e:
             print("Error extracting text from PDF:", e)
@@ -452,7 +463,9 @@ class Scraper:
             # Get the title of the document
             title = driver.find_element(By.XPATH, "/html/body/div[1]/div/main/div/div/div[2]/h1").text
             
-            self.__save_to_mongo(title, copied_text)
+            if not self.__save_to_mongo(title, copied_text, url):
+                return False
+            return True
 
         except Exception as e:
             print(f"An error occurred: {e}")
