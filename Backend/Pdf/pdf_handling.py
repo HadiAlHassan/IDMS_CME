@@ -11,7 +11,9 @@ from gridfs import GridFS
 from Utils.db import connect_to_mongo 
 from Utils.helper_functions import get_file_id_by_name, get_metadata
 from api.serializers import DocGeneralInfoSerializer
+from Utils.decorators import timing_decorator
 
+@timing_decorator
 @api_view(['POST'])
 def add_pdf(request):
     try:
@@ -39,7 +41,8 @@ def add_pdf(request):
             return Response({'error': 'Failed to add metadata and store the PDF', 'details': serializer.errors}, status=400)
     except pymongo_errors.PyMongoError as e:
         return Response({'error': str(e)}, status=400)
- 
+
+@timing_decorator 
 @api_view(['GET'])
 def get_pdf_by_id(request, file_id):
     try:
@@ -55,6 +58,7 @@ def get_pdf_by_id(request, file_id):
     except pymongo_errors.PyMongoError as e:
         return HttpResponse(f'Database error: {str(e)}', status=500)
 
+@timing_decorator
 @api_view(['GET'])
 def get_pdf_by_name(file_name):
     file_id = get_file_id_by_name(file_name)
@@ -63,6 +67,7 @@ def get_pdf_by_name(file_name):
     else:
         return HttpResponse('File not found', status=404)
 
+@timing_decorator
 @api_view(['GET', 'POST'])
 def list_files(request):
     try:
@@ -73,7 +78,8 @@ def list_files(request):
         return JsonResponse({'files': file_list})
     except pymongo_errors.PyMongoError as e:
         return HttpResponse(f'Database error: {str(e)}', status=500)     
-     
+
+@timing_decorator     
 @api_view(['POST'])
 def handle_selected_pdfs(request):
     try:
@@ -98,6 +104,7 @@ def handle_selected_pdfs(request):
     except Exception as e:
                 return JsonResponse({'error': str(e)}, status=400)
 
+@timing_decorator
 @api_view(['POST'])
 def get_metadata_by_pdf_name(request):
     try:

@@ -19,9 +19,3 @@ def get_metadata(pdf_title):
     docs = DocGeneralInfo.objects.filter(title__icontains=pdf_title)
     serializer = DocGeneralInfoSerializer(docs, many=True)
     return serializer.data
-
-def mongo_connection(func):
-    def wrapper(request, *args, **kwargs):
-        db = connect_to_mongo()
-        return func(request, db, *args, **kwargs) 
-    return wrapper
