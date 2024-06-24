@@ -42,7 +42,7 @@ def add_pdf(request):
 
 @timing_decorator 
 @api_view(['GET'])
-def get_pdf_by_id(file_id):
+def get_pdf_by_id(request, file_id):
     try:
         if not ObjectId.is_valid(file_id):
             return HttpResponse('Invalid file ID', status=400)
@@ -57,7 +57,7 @@ def get_pdf_by_id(file_id):
 
 @timing_decorator
 @api_view(['GET'])
-def get_pdf_by_name(file_name):
+def get_pdf_by_name(request, file_name):
     file_id = get_file_id_by_name(file_name)
     if file_id:
         return redirect('get_pdf_by_id', file_id=file_id)
