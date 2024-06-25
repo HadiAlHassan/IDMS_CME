@@ -5,11 +5,12 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from bson.objectid import ObjectId
 from pymongo import errors as pymongo_errors
-
+from django.db import transaction
+import datetime 
 
 from Utils.db import connect_to_mongo, connect_to_gridfs
 from Utils.helper_functions import get_file_id_by_name, get_metadata, get_text_from_pdf
-from api.serializers import DocGeneralInfoSerializer
+from api.serializers import DocGeneralInfoSerializer, NlpAnalysisSerializer
 from Utils.decorators import timing_decorator
 
 @timing_decorator
@@ -36,13 +37,43 @@ def add_pdf(request):
         if content!="":
             #need to call the add to csv function
             print(content)
-        serializer = DocGeneralInfoSerializer(data={'source': 'PDF', 'title': pdf_file.name, 'author': 'Ahmad'})
-        if serializer.is_valid():
-            serializer.save()
+        with transaction.atomic():
+            # Save DocGeneralInfo
+            general_info_data = {
+                'source': 'PDF',
+                'title': pdf_file.name,
+                'author': 'Ahmad'
+            }
+            general_info_serializer = DocGeneralInfoSerializer(data=general_info_data)
+            if general_info_serializer.is_valid():
+                general_info = general_info_serializer.save()
+            else:
+                return Response({'error': 'Failed to add DocGeneralInfo', 'details': general_info_serializer.errors}, status=400)
             
-            return Response({'message': 'PDF added successfully', 'file_id': str(file_id)})
-        else:
-            return Response({'error': 'Failed to add metadata and store the PDF', 'details': serializer.errors}, status=400)
+            # Save NlpAnalysis
+            nlp_analysis_data = {
+                'nlp_id': general_info.nlp_id,
+                'document_type': 'PDF',
+                'keywords': [],  # Add your keyword extraction logic here
+                'summary': '',  # Add your summarization logic here
+                'document_date': datetime.now().date(),
+                'category': 'Legal',  # Example category, change as needed
+                'related_documents': [],
+                'language': 'English',  # Example language, change as needed
+                'version': '1.0',  # Example version, change as needed
+                'confidentiality_level': 'Public',  # Example confidentiality level, change as needed
+                'location': 'Location A',  # Example location, change as needed
+                'references': [],
+                'uploaded_by': 'Ahmad',  # Example uploader, change as needed
+                'related_projects': []
+            }
+            nlp_analysis_serializer = NlpAnalysisSerializer(data=nlp_analysis_data)
+            if nlp_analysis_serializer.is_valid():
+                nlp_analysis_serializer.save()
+            else:
+                return Response({'error': 'Failed to add NlpAnalysis', 'details': nlp_analysis_serializer.errors}, status=400)
+        
+        return Response({'message': 'PDF, metadata, and NLP_analysis added successfully', 'file_id': str(file_id)})
     except pymongo_errors.PyMongoError as e:
         return Response({'error': str(e)}, status=400)
 
