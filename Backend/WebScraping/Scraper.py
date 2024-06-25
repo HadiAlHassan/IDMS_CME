@@ -256,7 +256,7 @@
 
 import time  
 from enum import Enum
-from ScrapingException import ScrapingException
+from WebScraping.ScrapingException import ScrapingException
 import requests
 import pyperclip  
 import pymupdf
@@ -440,7 +440,7 @@ class Scraper:
             self.__save_to_mongo(title, content, url)
                 
         except Exception as e:
-            raise ScrapingException("Error extracting text from PDF: {e}")
+            raise ScrapingException(f"{e}")
         
     def __scrape_legifrance(self, url):
 

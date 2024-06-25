@@ -32,9 +32,7 @@ function WsModal(props) {
       .catch((error) => {
         console.error("Error scraping website:", error);
         setShowErrorAlert(true);
-        setErrorMessage(
-          error.response?.data?.error || "Error scraping website"
-        );
+        setErrorMessage(error.response?.data?.error);
         setTimeout(() => setShowErrorAlert(false), 5000);
       });
     handleClose();

@@ -1,6 +1,6 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from ScrapingException import ScrapingException  # Ensure this import is correct
+from WebScraping.ScrapingException import ScrapingException  # Ensure this import is correct
 
 from Utils.decorators import timing_decorator
 from WebScraping.Scraper import Scraper
@@ -18,4 +18,4 @@ def scrape_website(request):
     except ScrapingException as e:
         return Response({'error': str(e)}, status=400)
     except Exception as e:
-        return Response({'error': 'An unexpected error occurred: ' + str(e)}, status=500)
+        return Response({'error': str(e)}, status=500)
