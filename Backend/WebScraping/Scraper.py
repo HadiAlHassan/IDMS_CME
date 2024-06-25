@@ -275,7 +275,7 @@ from rest_framework.response import Response
 from Utils.db import connect_to_gridfs
 from Utils.helper_functions import get_text_from_txt
 from api.serializers import DocGeneralInfoSerializer
-
+from Nlp.wordcloud_generator_testing import test_word_cloud
 class DomainSource(Enum):
     HarvardLawReview = 1
     GoogleScholar = 2
@@ -390,13 +390,11 @@ class Scraper:
             
             file_id = fs.put(content.encode('utf-8'), filename=filtered_filename)
             content = get_text_from_txt(file_id)
-            if content!="":
-                #need to call the add_to csv function
-                print(content)
             serializer = DocGeneralInfoSerializer(data={'source': url , 'title': filtered_filename, 'author': 'Ahmad'})
             if serializer.is_valid():
                 serializer.save()
-            
+                if content!="":
+                    test_word_cloud(content)
             else:
                 raise ScrapingException("Error in saving document general info to MongoDB")
 
