@@ -256,6 +256,7 @@
 
 import time  
 from enum import Enum
+from ScrapingException import ScrapingException
 import requests
 import pyperclip  
 import pymupdf
@@ -270,7 +271,6 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from pymongo import MongoClient
 from gridfs import GridFS
 from rest_framework.response import Response
-
 from Utils.db import connect_to_gridfs
 from api.serializers import DocGeneralInfoSerializer
 
@@ -349,7 +349,9 @@ class Scraper:
         }
 
     def __setup_driver(self):
-        driver = webdriver.Chrome()
+        options = Options()
+        options.headless = True
+        driver = webdriver.Chrome(options=options)
         return driver
 
     def determine_domain_source(self, url):
@@ -367,9 +369,11 @@ class Scraper:
             page.raise_for_status()
             return BeautifulSoup(page.text, 'lxml')
         
-        except requests.exceptions.HTTPError as e:
-            print("HTTP error occurred: ", e)
-            return None
+        except requests.exceptions.HTTPError:
+            raise ScrapingException("HTTP error occurred while fetching the URL")
+        
+        except Exception as e:
+            raise ScrapingException(f"An error occurred while fetching the URL: {e}")
 
     def __save_to_mongo(self, title, content, url):
         try:
@@ -380,17 +384,19 @@ class Scraper:
 
             existing_website = fs.find_one({'filename': filtered_filename})
             if existing_website:
-                return False
+                raise ScrapingException("This content already exists in the database.")
             
             file_id = fs.put(content.encode('utf-8'), filename=filtered_filename)
 
             serializer = DocGeneralInfoSerializer(data={'source': url , 'title': filtered_filename, 'author': 'Ahmad'})
             if serializer.is_valid():
                 serializer.save()
-            return True   
+            
+            else:
+                raise ScrapingException("Error in saving document general info to MongoDB")
 
         except Exception as e:
-            return False
+            raise ScrapingException(f"An error occurred while saving the content: {e}")
 
     def __extract_webpage_content(self, soup, tags):
         
@@ -402,26 +408,19 @@ class Scraper:
             content = content_tag.text.strip()
             return title, content
         else:
-            print("Could not find the title or content on the page.")
-            return None, None
+            raise ScrapingException("Could not find the title or content on the page.")
 
     def __scrape_webpage(self, url):
 
         domain_source = self.determine_domain_source(url)
-
         soup = self.__get_soup(url, headers=self.headers)
 
         if soup:
-
             tags = self.url_mapper[domain_source]["tags"]
-
             title, content = self.__extract_webpage_content(soup, tags)
 
             if title and content:
-                if not self.__save_to_mongo(title, content, url) :
-                    return False
-                return True
-
+                self.__save_to_mongo(title, content, url)
 
     def __extract_text_from_pdf(self, url):
         try:
@@ -438,41 +437,34 @@ class Scraper:
 
             title = url.split('/')[-1]
 
-            if not self.__save_to_mongo(title, content, url):
-                return False
-            return True
-
+            self.__save_to_mongo(title, content, url)
+                
         except Exception as e:
-            print("Error extracting text from PDF:", e)
-
+            raise ScrapingException("Error extracting text from PDF: {e}")
+        
     def __scrape_legifrance(self, url):
+
         driver = self.__setup_driver()
 
         try:
             driver.get(url)
-            wait = WebDriverWait(driver, 10)
 
-            # Wait until the copy button is visible and click it
+            wait = WebDriverWait(driver, 10)
             copy_button = wait.until(EC.visibility_of_element_located((By.XPATH, "/html/body/div[1]/div/main/div/div/div[1]/div/div/ul/li[2]/button")))
             copy_button.click()
 
-            # Wait for the text to be copied to the clipboard
             time.sleep(1)
             copied_text = pyperclip.paste()
 
-            # Get the title of the document
             title = driver.find_element(By.XPATH, "/html/body/div[1]/div/main/div/div/div[2]/h1").text
-            
-            if not self.__save_to_mongo(title, copied_text, url):
-                return False
-            return True
+            self.__save_to_mongo(title, copied_text, url)
 
         except Exception as e:
-            print(f"An error occurred: {e}")
-
+            raise ScrapingException(f"An error occurred: {e}")
+        
         finally:
-            if driver:
-                driver.quit()
+            driver.quit()
+
 
     def scrape(self, url):
 
@@ -481,7 +473,7 @@ class Scraper:
         if domain_source:
             return self.url_mapper[domain_source]['method'](url)
         else:
-            print("This website is not supported by the scraper.")
+            raise ScrapingException("This website is not supported by the scraper.")
 
 
 if __name__=="__main__":
