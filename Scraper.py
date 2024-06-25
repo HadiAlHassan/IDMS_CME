@@ -86,7 +86,9 @@ class Scraper:
         }
 
     def __setup_driver(self):
-        driver = webdriver.Chrome()
+        options = Options()
+        options.headless = True  # Run in headless mode
+        driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
         return driver
 
     def determine_domain_source(self, url):
