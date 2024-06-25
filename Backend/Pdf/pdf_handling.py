@@ -12,6 +12,7 @@ from Utils.db import connect_to_mongo, connect_to_gridfs
 from Utils.helper_functions import get_file_id_by_name, get_metadata, get_text_from_pdf
 from api.serializers import DocGeneralInfoSerializer, NlpAnalysisSerializer
 from Utils.decorators import timing_decorator
+from Nlp.wordcloud_generator_testing import test_word_cloud
 
 @timing_decorator
 @api_view(['POST'])
@@ -69,7 +70,12 @@ def add_pdf(request):
             else:
                 return Response({'error': 'Failed to add NlpAnalysis', 'details': nlp_analysis_serializer.errors}, status=400)
         
+        content = get_text_from_pdf(file_id)
+        if content!="":
+            test_word_cloud(content)
+        
         return Response({'message': 'PDF, metadata, and NLP_analysis added successfully', 'file_id': str(file_id)})
+        
     except pymongo_errors.PyMongoError as e:
         return Response({'error': str(e)}, status=400)
 

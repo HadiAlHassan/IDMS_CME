@@ -271,10 +271,13 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from pymongo import MongoClient
 from gridfs import GridFS
 from rest_framework.response import Response
+from django.db import transaction
 
 from Utils.db import connect_to_gridfs
 from Utils.helper_functions import get_text_from_txt
-from api.serializers import DocGeneralInfoSerializer
+from api.serializers import DocGeneralInfoSerializer, NlpAnalysisSerializer
+from Nlp.wordcloud_generator_testing import test_word_cloud
+
 
 class DomainSource(Enum):
     HarvardLawReview = 1
@@ -380,7 +383,6 @@ class Scraper:
     def __save_to_mongo(self, title, content, url):
         try:
             fs = connect_to_gridfs()
-
             filename = f"{title}.txt"
             filtered_filename = filename.replace(":", "").replace("/", "_").replace("\n"," ").replace("\r"," ")
 
@@ -389,13 +391,47 @@ class Scraper:
                 raise ScrapingException("This content already exists in the database.")
             
             file_id = fs.put(content.encode('utf-8'), filename=filtered_filename)
-            serializer = DocGeneralInfoSerializer(data={'source': url , 'title': filtered_filename, 'author': 'Ahmad'})
-            if serializer.is_valid():
-                serializer.save()
             
+            with transaction.atomic():
+            # Save DocGeneralInfo
+                general_info_data = {
+                    'source': url,
+                    'title':  filtered_filename,
+                    'author': 'Ahmad'
+                }
+            general_info_serializer = DocGeneralInfoSerializer(data=general_info_data)
+            if general_info_serializer.is_valid():
+                general_info = general_info_serializer.save()
             else:
                 raise ScrapingException("Error in saving document general info to MongoDB")
-
+            
+            # Save NlpAnalysis
+            nlp_analysis_data = {
+                'nlp_id': general_info.nlp_id,
+                'document_type': 'PDF',
+                'keywords': [],  # Add your keyword extraction logic here
+                'summary': '',  # Add your summarization logic here
+                'document_date': datetime.now().date(),
+                'category': 'Legal',  # Example category, change as needed
+                'related_documents': [],
+                'language': 'English',  # Example language, change as needed
+                'version': '1.0',  # Example version, change as needed
+                'confidentiality_level': 'Public',  # Example confidentiality level, change as needed
+                'location': 'Location A',  # Example location, change as needed
+                'references': [],
+                'uploaded_by': 'Ahmad',  # Example uploader, change as needed
+                'related_projects': []
+            }
+            nlp_analysis_serializer = NlpAnalysisSerializer(data=nlp_analysis_data)
+            if nlp_analysis_serializer.is_valid():
+                nlp_analysis_serializer.save()
+            else:
+                raise ScrapingException("Error in saving document general info to MongoDB")
+            
+            content = get_text_from_txt(file_id)
+            if content!="":
+                    test_word_cloud(content)
+            
         except Exception as e:
             raise ScrapingException(f"An error occurred while saving the content: {e}")
 
