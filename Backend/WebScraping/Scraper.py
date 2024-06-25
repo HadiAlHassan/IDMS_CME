@@ -389,10 +389,6 @@ class Scraper:
                 raise ScrapingException("This content already exists in the database.")
             
             file_id = fs.put(content.encode('utf-8'), filename=filtered_filename)
-            content = get_text_from_txt(file_id)
-            if content!="":
-                #need to call the add_to csv function
-                print(content)
             serializer = DocGeneralInfoSerializer(data={'source': url , 'title': filtered_filename, 'author': 'Ahmad'})
             if serializer.is_valid():
                 serializer.save()

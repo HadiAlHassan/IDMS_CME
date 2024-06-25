@@ -33,10 +33,6 @@ def add_pdf(request):
         """
         Here I need to implement the code to save the file metadata in the database for now i will just save the file_id in the general info cluster
         """
-        content = get_text_from_pdf(file_id)
-        if content!="":
-            #need to call the add to csv function
-            print(content)
         with transaction.atomic():
             # Save DocGeneralInfo
             general_info_data = {
