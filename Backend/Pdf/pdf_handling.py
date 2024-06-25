@@ -8,7 +8,7 @@ from pymongo import errors as pymongo_errors
 
 
 from Utils.db import connect_to_mongo, connect_to_gridfs
-from Utils.helper_functions import get_file_id_by_name, get_metadata
+from Utils.helper_functions import get_file_id_by_name, get_metadata, get_text_from_pdf
 from api.serializers import DocGeneralInfoSerializer
 from Utils.decorators import timing_decorator
 
@@ -32,6 +32,10 @@ def add_pdf(request):
         """
         Here I need to implement the code to save the file metadata in the database for now i will just save the file_id in the general info cluster
         """
+        content = get_text_from_pdf(file_id)
+        if content!="":
+            #need to call the add to csv function
+            print(content)
         serializer = DocGeneralInfoSerializer(data={'source': 'PDF', 'title': pdf_file.name, 'author': 'Ahmad'})
         if serializer.is_valid():
             serializer.save()
