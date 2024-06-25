@@ -120,8 +120,8 @@ class Scraper:
                 file.write(content)
 
         except IOError as e:
-            print(f"Error saving content to {filtered_filename}: {e}")
-
+            print(f"An error occurred while saving the content: {e}")
+            
     def __extract_webpage_content(self, soup, tags):
         
         title_tag = soup.find(tags['title']['tag'], class_= tags['title'].get('class'), id = tags['title'].get('id'))
