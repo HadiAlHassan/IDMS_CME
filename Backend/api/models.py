@@ -2,6 +2,7 @@ from djongo import models
 import random
 
 class DocGeneralInfo(models.Model):
+    _id = models.ObjectIdField(primary_key=True)
     general_info_id = models.IntegerField(unique=True)
     date_submitted = models.DateTimeField(auto_now_add=True)
     source = models.TextField()
@@ -33,9 +34,8 @@ class DocGeneralInfo(models.Model):
             if not DocGeneralInfo.objects.filter(nlp_id=random_id).exists():
                 return random_id
 
-
-
 class NlpAnalysis(models.Model):
+    
     LANGUAGE_CHOICES = [
         ('English', 'English'),
         ('French', 'French'),
@@ -55,8 +55,8 @@ class NlpAnalysis(models.Model):
         ('Healthcare', 'Healthcare'),
         # Add other categories as needed
     ]
-
-    nlp_id = models.OneToOneField(DocGeneralInfo, on_delete=models.CASCADE, to_field='nlp_id', primary_key=True)
+    _id = models.ObjectIdField(primary_key=True)
+    nlp_id = models.OneToOneField(DocGeneralInfo, on_delete=models.CASCADE, to_field='nlp_id', db_column='nlp_id')
     document_type = models.CharField(max_length=100)
     keywords = models.JSONField()
     summary = models.TextField()

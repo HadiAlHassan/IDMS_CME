@@ -260,6 +260,7 @@ from WebScraping.ScrapingException import ScrapingException
 import requests
 import pyperclip  
 import pymupdf
+import datetime
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -272,6 +273,7 @@ from pymongo import MongoClient
 from gridfs import GridFS
 from rest_framework.response import Response
 from django.db import transaction
+
 
 from Utils.db import connect_to_gridfs
 from Utils.helper_functions import get_text_from_txt
@@ -410,8 +412,8 @@ class Scraper:
                 'nlp_id': general_info.nlp_id,
                 'document_type': 'PDF',
                 'keywords': [],  # Add your keyword extraction logic here
-                'summary': '',  # Add your summarization logic here
-                'document_date': datetime.now().date(),
+                'summary': 'the summary of a text',  # Add your summarization logic here
+                'document_date': datetime.datetime.now().date(),
                 'category': 'Legal',  # Example category, change as needed
                 'related_documents': [],
                 'language': 'English',  # Example language, change as needed

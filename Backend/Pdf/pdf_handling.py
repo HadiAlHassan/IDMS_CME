@@ -24,18 +24,15 @@ def add_pdf(request):
         
         if not pdf_file.name.endswith('.pdf'):
             return Response({'error': 'Invalid file type'}, status=400)
+        
         fs = connect_to_gridfs()
-              
         existing_file = fs.find_one({'filename': pdf_file.name})
         if existing_file:
             return Response({'error': 'File already exists'}, status=400)
         
         file_id = fs.put(pdf_file, filename=pdf_file.name)
-        """
-        Here I need to implement the code to save the file metadata in the database for now i will just save the file_id in the general info cluster
-        """
+        
         with transaction.atomic():
-            # Save DocGeneralInfo
             general_info_data = {
                 'source': 'PDF',
                 'title': pdf_file.name,
@@ -44,16 +41,16 @@ def add_pdf(request):
             general_info_serializer = DocGeneralInfoSerializer(data=general_info_data)
             if general_info_serializer.is_valid():
                 general_info = general_info_serializer.save()
+                
             else:
                 return Response({'error': 'Failed to add DocGeneralInfo', 'details': general_info_serializer.errors}, status=400)
             
-            # Save NlpAnalysis
             nlp_analysis_data = {
                 'nlp_id': general_info.nlp_id,
                 'document_type': 'PDF',
                 'keywords': [],  # Add your keyword extraction logic here
-                'summary': '',  # Add your summarization logic here
-                'document_date': datetime.now().date(),
+                'summary': 'the summary of a text',  # Add your summarization logic here
+                'document_date': datetime.datetime.now().date(),
                 'category': 'Legal',  # Example category, change as needed
                 'related_documents': [],
                 'language': 'English',  # Example language, change as needed
@@ -68,10 +65,11 @@ def add_pdf(request):
             if nlp_analysis_serializer.is_valid():
                 nlp_analysis_serializer.save()
             else:
+                
                 return Response({'error': 'Failed to add NlpAnalysis', 'details': nlp_analysis_serializer.errors}, status=400)
         
         content = get_text_from_pdf(file_id)
-        if content!="":
+        if content != "":
             test_word_cloud(content)
         
         return Response({'message': 'PDF, metadata, and NLP_analysis added successfully', 'file_id': str(file_id)})

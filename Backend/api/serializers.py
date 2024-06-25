@@ -6,14 +6,14 @@ from .models import DocGeneralInfo, NlpAnalysis
 class DocGeneralInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = DocGeneralInfo
-        fields = ['general_info_id', 'date_submitted', 'source', 'title', 'author', 'nlp_id']
+        fields = ['_id','general_info_id', 'date_submitted', 'source', 'title', 'author', 'nlp_id']
         read_only_fields = ['general_info_id', 'nlp_id', 'date_submitted']
 
 class NlpAnalysisSerializer(serializers.ModelSerializer):
     class Meta:
         model = NlpAnalysis
-        fields = [
+        fields = ['_id',
             'nlp_id', 'document_type', 'keywords', 'summary', 'document_date', 'category',
-            'related_documents', 'status', 'language', 'version', 'confidentiality_level',
-            'location', 'references', 'uploaded_by', 'approval_status', 'related_projects'
+            'related_documents', 'language', 'version', 'confidentiality_level',
+            'location', 'references', 'uploaded_by', 'related_projects'
         ]
