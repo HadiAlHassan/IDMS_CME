@@ -1,0 +1,25 @@
+:root {
+  min-height: 100vh;
+  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 400;
+  background-color: #f2f2f2;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+.flexContainer {
+  display: flex;
+  margin-top: 1.3rem;
+}
+
+.addPdfContainer {
+  margin-right: 1.3rem;
+}
+.viewPdfContainer {
+  margin-right: 1.3rem;
+}

@@ -1,0 +1,8 @@
+.MuiAlert-filledSuccess {
+  background-color: #f44336;
+}
+
+.alert {
+  display: flex;
+  align-items: center;
+}
