@@ -18,14 +18,14 @@
 
 @media (max-width: 982px) {
   .pieChartContainer {
-    padding: 10px;
+    padding: 10px; /* Reduce padding on smaller screens */
   }
 
   .title {
-    font-size: 18px;
+    font-size: 18px; /* Adjust title size for smaller screens */
   }
 
   .legend {
-    font-size: 12px;
+    font-size: 12px; /* Adjust legend size for smaller screens */
   }
 }
