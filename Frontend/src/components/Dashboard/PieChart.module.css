@@ -1,0 +1,31 @@
+.pieChartContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center content horizontally */
+  justify-content: center; /* Center content vertically */
+  padding: 20px;
+  background-color: #3494e3; /* Example background color */
+  border-radius: 8px; /* Example border radius */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Example shadow */
+}
+
+.title {
+  font-size: 20px;
+  text-align: center; /* Center the text */
+  margin-top: 0;
+  color: #f2f2f2;
+}
+
+@media (max-width: 982px) {
+  .pieChartContainer {
+    padding: 10px;
+  }
+
+  .title {
+    font-size: 18px;
+  }
+
+  .legend {
+    font-size: 12px;
+  }
+}

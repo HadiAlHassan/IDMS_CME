@@ -1,17 +1,16 @@
 import matplotlib
 matplotlib.use('Agg')
-
-from wordcloud import WordCloud
-import matplotlib.pyplot as plt
-import nltk
-from nltk.tokenize import word_tokenize
-from nltk.corpus import stopwords
-from nltk.stem import WordNetLemmatizer
 import re
 import pandas as pd
+import matplotlib.pyplot as plt
+import nltk
 from io import BytesIO
 from pathlib import Path
 from collections import Counter
+from wordcloud import WordCloud
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
 
 def preprocess_text(text):
     text = re.sub(r'[^A-Za-z0-9\s]', '', text)
@@ -54,7 +53,6 @@ def generate_word_cloud_from_string(input_string, csv_path, output_path):
     # Generate the word cloud using the updated word frequencies
     wordcloud = WordCloud(width=800, height=400, background_color='white')
     wordcloud.generate_from_frequencies(word_frequencies)
-    
     # Plot the word cloud
     plt.figure(figsize=(10, 5))
     plt.imshow(wordcloud, interpolation='bilinear')

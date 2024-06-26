@@ -1,0 +1,21 @@
+.dashboardBackground {
+  display: grid;
+  grid-template-columns: 1fr; /* Single column layout by default */
+  gap: 20px; /* Space between the items */
+  padding: 20px; /* Padding around the entire container */
+}
+
+@media (min-width: 768px) {
+  .dashboardBackground {
+    grid-template-columns: 1fr 1fr; /* Two columns layout for larger screens */
+  }
+}
+
+.column.column {
+  /* background-color: #f0f0f0; Background color for the card */
+  background-color: #1769aa;
+  opacity: 0.9;
+  padding: 0; /* Padding is handled by the Card component */
+  border-radius: 10px; /* Rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
