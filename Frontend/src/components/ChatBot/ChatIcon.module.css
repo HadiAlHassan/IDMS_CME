@@ -1,0 +1,17 @@
+.floatingActionButtonContainer {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+}
+
+.floatingActionButton {
+  background-color: #1769aa !important;
+}
+
+.floatingActionButton:hover {
+  background-color: #1769aa !important;
+}
+
+.floatingActionIcon {
+  color: #f2f2f2 !important;
+}

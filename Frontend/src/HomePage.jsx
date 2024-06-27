@@ -3,6 +3,7 @@ import AddPdf from "./components/Pdf/AddPdf";
 import ListPdfs from "./components/Pdf/ListPdfs";
 import WebScrapButton from "./components/Webscraping/WebScrapButton";
 import Dashboard from "./components/Dashboard/Dashboard";
+import FloatingActionButton from "./components/ChatBot/ChatIcon";
 import { Container } from "@mui/material";
 import "./index.css";
 
@@ -25,6 +26,7 @@ function HomePage() {
           <Dashboard />
         </div>
       </Container>
+      <FloatingActionButton />
     </div>
   );
 }
