@@ -279,7 +279,7 @@ from Utils.db import connect_to_gridfs
 from Utils.helper_functions import get_text_from_txt
 from api.serializers import DocGeneralInfoSerializer, NlpAnalysisSerializer
 from Nlp.wordcloud_generator_testing import test_word_cloud
-
+from Nlp.categorization import predict_label_from_string
 
 class DomainSource(Enum):
     HarvardLawReview = 1
@@ -407,6 +407,12 @@ class Scraper:
             else:
                 raise ScrapingException("Error in saving document general info to MongoDB")
             
+            content = get_text_from_txt(file_id)
+            category = "Other"
+            if content!="":
+                    test_word_cloud(content)
+                    category = predict_label_from_string(content)
+
             # Save NlpAnalysis
             nlp_analysis_data = {
                 'nlp_id': general_info.nlp_id,
@@ -414,7 +420,7 @@ class Scraper:
                 'keywords': [],  # Add your keyword extraction logic here
                 'summary': 'the summary of a text',  # Add your summarization logic here
                 'document_date': datetime.datetime.now().date(),
-                'category': 'Legal',  # Example category, change as needed
+                'category': category,  # Example category, change as needed
                 'related_documents': [],
                 'language': 'English',  # Example language, change as needed
                 'version': '1.0',  # Example version, change as needed
@@ -429,10 +435,6 @@ class Scraper:
                 nlp_analysis_serializer.save()
             else:
                 raise ScrapingException("Error in saving document general info to MongoDB")
-            
-            content = get_text_from_txt(file_id)
-            if content!="":
-                    test_word_cloud(content)
             
         except Exception as e:
             raise ScrapingException(f"An error occurred while saving the content: {e}")

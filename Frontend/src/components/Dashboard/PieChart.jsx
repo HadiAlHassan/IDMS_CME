@@ -4,9 +4,13 @@ import { PieChart } from "@mui/x-charts/PieChart";
 
 function PieChartComponent() {
   const data = [
-    { id: 0, value: 10, label: "Agreements", color: "#2E86C1" },
-    { id: 1, value: 15, label: "Court Cases", color: "#1ABC9C" },
-    { id: 2, value: 20, label: "Contracts", color: "#8E44AD" },
+    { id: 0, value: 20, label: "Agreement", color: "#2E86C1" },
+    { id: 1, value: 20, label: "Court Case", color: "#1ABC9C" },
+    { id: 2, value: 10, label: "Contract", color: "#8E44AD" },
+    { id: 3, value: 10, label: "Technology" },
+    { id: 4, value: 10, label: "Politics" },
+    { id: 5, value: 10, label: "Sport" },
+    { id: 6, value: 19, label: "Business" },
   ];
 
   return (
@@ -29,7 +33,7 @@ function PieChartComponent() {
               },
             },
           }}
-          height={200}
+          height={250}
         />
       </div>
     </>

@@ -50,9 +50,13 @@ class NlpAnalysis(models.Model):
     ]
 
     CATEGORY_CHOICES = [
-        ('Legal', 'Legal'),
-        ('Finance', 'Finance'),
-        ('Healthcare', 'Healthcare'),
+        ('Contract','Contract'),
+        ('Technology','Technology'),
+        ('Politics', 'Politics'),
+        ('Court Case', 'Business'),
+        ('Agreement', 'Agreement'),
+        ('Sport', 'Sport'),
+        ('Other','Other')
         # Add other categories as needed
     ]
     _id = models.ObjectIdField(primary_key=True)

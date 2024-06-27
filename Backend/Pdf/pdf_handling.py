@@ -13,6 +13,7 @@ from Utils.helper_functions import get_file_id_by_name, get_metadata, get_text_f
 from api.serializers import DocGeneralInfoSerializer, NlpAnalysisSerializer
 from Utils.decorators import timing_decorator
 from Nlp.wordcloud_generator_testing import test_word_cloud
+from Nlp.categorization import predict_label_from_string
 
 @timing_decorator
 @api_view(['POST'])
@@ -32,6 +33,7 @@ def add_pdf(request):
         
         file_id = fs.put(pdf_file, filename=pdf_file.name)
         
+
         with transaction.atomic():
             general_info_data = {
                 'source': 'PDF',
@@ -45,13 +47,18 @@ def add_pdf(request):
             else:
                 return Response({'error': 'Failed to add DocGeneralInfo', 'details': general_info_serializer.errors}, status=400)
             
+            content = get_text_from_pdf(file_id)
+            category = "Other"
+            if content != "":
+                test_word_cloud(content)
+                category = predict_label_from_string(content)
             nlp_analysis_data = {
                 'nlp_id': general_info.nlp_id,
                 'document_type': 'PDF',
                 'keywords': [],  # Add your keyword extraction logic here
                 'summary': 'the summary of a text',  # Add your summarization logic here
                 'document_date': datetime.datetime.now().date(),
-                'category': 'Legal',  # Example category, change as needed
+                'category': category,  # Example category, change as needed
                 'related_documents': [],
                 'language': 'English',  # Example language, change as needed
                 'version': '1.0',  # Example version, change as needed
@@ -68,9 +75,8 @@ def add_pdf(request):
                 
                 return Response({'error': 'Failed to add NlpAnalysis', 'details': nlp_analysis_serializer.errors}, status=400)
         
-        content = get_text_from_pdf(file_id)
-        if content != "":
-            test_word_cloud(content)
+        
+        
         
         return Response({'message': 'PDF, metadata, and NLP_analysis added successfully', 'file_id': str(file_id)})
         
