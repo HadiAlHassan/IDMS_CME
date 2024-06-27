@@ -72,7 +72,7 @@ export default function ChatScreen({ open, handleClose }) {
             <TextField
               className={classes.textField}
               variant="outlined"
-              placeholder="Type a message..."
+              placeholder="Ask me a question..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={(e) => {
