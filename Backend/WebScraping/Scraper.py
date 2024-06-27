@@ -281,6 +281,7 @@ from api.serializers import DocGeneralInfoSerializer, NlpAnalysisSerializer
 from Nlp.wordcloud_generator_testing import test_word_cloud
 from Nlp.categorization import predict_label_from_string
 from Nlp.name_entity_recognition import extract_entities_from_text
+from Nlp.nlp_analysis import extract_metadata_text
 
 class DomainSource(Enum):
     HarvardLawReview = 1
@@ -394,13 +395,20 @@ class Scraper:
                 raise ScrapingException("This content already exists in the database.")
             
             file_id = fs.put(content.encode('utf-8'), filename=filtered_filename)
-            
+            content = get_text_from_txt(file_id)
+            if content!="":
+                    test_word_cloud(content)
+                    category = predict_label_from_string(content)
+                    ner = extract_entities_from_text(content)
+                    metadata_dict = extract_metadata_text(content)
+
+
             with transaction.atomic():
             # Save DocGeneralInfo
                 general_info_data = {
                     'source': url,
-                    'title':  filtered_filename,
-                    'author': 'Ahmad'
+                    'title':  metadata_dict["title"],
+                    'author':metadata_dict["title"]
                 }
             general_info_serializer = DocGeneralInfoSerializer(data=general_info_data)
             if general_info_serializer.is_valid():
@@ -408,29 +416,23 @@ class Scraper:
             else:
                 raise ScrapingException("Error in saving document general info to MongoDB")
             
-            content = get_text_from_txt(file_id)
+            
             category = "Other"
             ner = {}
-            if content!="":
-                    test_word_cloud(content)
-                    category = predict_label_from_string(content)
-                    ner = extract_entities_from_text(content)
+            
             # Save NlpAnalysis
             nlp_analysis_data = {
                 'nlp_id': general_info.nlp_id,
-                'document_type': 'Website',
-                'keywords': [],  # Add your keyword extraction logic here
-                'summary': 'the summary of a text',  # Add your summarization logic here
-                'document_date': datetime.datetime.now().date(),
+                'document_type': 'PDF',
+                'summary': metadata_dict["summary"],  # Add your summarization logic here
                 'category': category,  # Example category, change as needed
-                'related_documents': [],
-                'language': 'English',  # Example language, change as needed
+                'language': metadata_dict["language"],  # Example language, change as needed
                 'ner': ner,  
-                'confidentiality_level': 'Public',  # Example confidentiality level, change as needed
-                'location': 'Location A',  # Example location, change as needed
-                'references': [],
-                'uploaded_by': 'Ahmad',  # Example uploader, change as needed
-                'related_projects': []
+                'confidentiality_level': metadata_dict["confidentiality"],  # Example confidentiality level, change as needed
+                'location': metadata_dict["locations"],  # Example location, change as needed
+                'references': metadata_dict["references"],
+                'in_text_citations': metadata_dict["in_text_citations"],  # Example uploader, change as needed
+                'word_count': metadata_dict["word_count"]
             }
             nlp_analysis_serializer = NlpAnalysisSerializer(data=nlp_analysis_data)
             if nlp_analysis_serializer.is_valid():

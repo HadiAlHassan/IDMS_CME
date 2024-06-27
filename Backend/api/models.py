@@ -62,18 +62,15 @@ class NlpAnalysis(models.Model):
     _id = models.ObjectIdField(primary_key=True)
     nlp_id = models.OneToOneField(DocGeneralInfo, on_delete=models.CASCADE, to_field='nlp_id', db_column='nlp_id')
     document_type = models.CharField(max_length=100)
-    keywords = models.JSONField()
     summary = models.TextField()
-    document_date = models.DateField()
     category = models.CharField(max_length=100, choices=CATEGORY_CHOICES)
-    related_documents = models.JSONField()
-    language = models.CharField(max_length=50, choices=LANGUAGE_CHOICES)
+    language = models.TextField()
     ner = models.JSONField()
-    confidentiality_level = models.CharField(max_length=50, choices=CONFIDENTIALITY_CHOICES)
-    location = models.CharField(max_length=255)
+    confidentiality_level = models.BooleanField()
+    location = models.JSONField()
     references = models.JSONField()
-    uploaded_by = models.CharField(max_length=100)
-    related_projects = models.JSONField()
-
+    in_text_citations=models.JSONField()
+    word_count = models.IntegerField()
+    
     class Meta:
         db_table = 'nlp_analysis'
