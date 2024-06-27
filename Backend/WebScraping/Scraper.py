@@ -280,6 +280,7 @@ from Utils.helper_functions import get_text_from_txt
 from api.serializers import DocGeneralInfoSerializer, NlpAnalysisSerializer
 from Nlp.wordcloud_generator_testing import test_word_cloud
 from Nlp.categorization import predict_label_from_string
+from Nlp.name_entity_recognition import extract_entities_from_text
 
 class DomainSource(Enum):
     HarvardLawReview = 1
@@ -409,21 +410,22 @@ class Scraper:
             
             content = get_text_from_txt(file_id)
             category = "Other"
+            ner = {}
             if content!="":
                     test_word_cloud(content)
                     category = predict_label_from_string(content)
-
+                    ner = extract_entities_from_text(content)
             # Save NlpAnalysis
             nlp_analysis_data = {
                 'nlp_id': general_info.nlp_id,
-                'document_type': 'PDF',
+                'document_type': 'Website',
                 'keywords': [],  # Add your keyword extraction logic here
                 'summary': 'the summary of a text',  # Add your summarization logic here
                 'document_date': datetime.datetime.now().date(),
                 'category': category,  # Example category, change as needed
                 'related_documents': [],
                 'language': 'English',  # Example language, change as needed
-                'version': '1.0',  # Example version, change as needed
+                'ner': ner,  
                 'confidentiality_level': 'Public',  # Example confidentiality level, change as needed
                 'location': 'Location A',  # Example location, change as needed
                 'references': [],

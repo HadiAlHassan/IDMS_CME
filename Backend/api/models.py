@@ -68,7 +68,7 @@ class NlpAnalysis(models.Model):
     category = models.CharField(max_length=100, choices=CATEGORY_CHOICES)
     related_documents = models.JSONField()
     language = models.CharField(max_length=50, choices=LANGUAGE_CHOICES)
-    version = models.CharField(max_length=50)
+    ner = models.JSONField()
     confidentiality_level = models.CharField(max_length=50, choices=CONFIDENTIALITY_CHOICES)
     location = models.CharField(max_length=255)
     references = models.JSONField()

@@ -14,6 +14,6 @@ class NlpAnalysisSerializer(serializers.ModelSerializer):
         model = NlpAnalysis
         fields = ['_id',
             'nlp_id', 'document_type', 'keywords', 'summary', 'document_date', 'category',
-            'related_documents', 'language', 'version', 'confidentiality_level',
+            'related_documents', 'language', 'ner', 'confidentiality_level',
             'location', 'references', 'uploaded_by', 'related_projects'
         ]

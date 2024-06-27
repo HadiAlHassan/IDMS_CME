@@ -14,6 +14,7 @@ from api.serializers import DocGeneralInfoSerializer, NlpAnalysisSerializer
 from Utils.decorators import timing_decorator
 from Nlp.wordcloud_generator_testing import test_word_cloud
 from Nlp.categorization import predict_label_from_string
+from Nlp.name_entity_recognition import extract_entities_from_text
 
 @timing_decorator
 @api_view(['POST'])
@@ -49,9 +50,11 @@ def add_pdf(request):
             
             content = get_text_from_pdf(file_id)
             category = "Other"
+            ner = {}
             if content != "":
                 test_word_cloud(content)
                 category = predict_label_from_string(content)
+                ner = extract_entities_from_text(content)
             nlp_analysis_data = {
                 'nlp_id': general_info.nlp_id,
                 'document_type': 'PDF',
@@ -61,7 +64,7 @@ def add_pdf(request):
                 'category': category,  # Example category, change as needed
                 'related_documents': [],
                 'language': 'English',  # Example language, change as needed
-                'version': '1.0',  # Example version, change as needed
+                'ner': ner,  
                 'confidentiality_level': 'Public',  # Example confidentiality level, change as needed
                 'location': 'Location A',  # Example location, change as needed
                 'references': [],
