@@ -2,6 +2,7 @@ from django.urls import path
 from api import views  
 from Pdf import pdf_handling
 from WebScraping import WS_handling
+from gen_ai import chat_bot
 
 urlpatterns = [ #redirects to api/views.py
     path('add-doc', views.add_doc, name='add_doc'),
@@ -12,4 +13,5 @@ urlpatterns = [ #redirects to api/views.py
     path('handle-selected-pdfs', pdf_handling.handle_selected_pdfs, name='handle_selected_pdfs'),
     path('get_metadata_by_pdf_name', pdf_handling.get_metadata_by_pdf_name, name='get_metadata_by_pdf_name'),
     path('scrape-website', WS_handling.scrape_website, name='scrape_website'),
+    path('chat-bot', chat_bot.chatbot, name='chat_bot')
 ]
