@@ -1,0 +1,66 @@
+.viewerContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #f2f2f2;
+  overflow: hidden;
+}
+
+.metadataContainer {
+  width: 100%;
+  padding: 20px;
+  overflow-y: auto;
+  background-color: #f2f2f2;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.metadataTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.metadataTable th,
+.metadataTable td {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+.metadataTable tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.metadataKey {
+  font-weight: bold;
+  background-color: #e9e9e9;
+}
+
+.pdfViewerContainer {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f2f2f2;
+}
+
+.pdfDocument {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  height: 90vh;
+  overflow: auto;
+}
+
+@media (min-width: 768px) {
+  .viewerContainer {
+    flex-direction: row;
+  }
+
+  .metadataContainer {
+    width: 40%;
+  }
+
+  .pdfViewerContainer {
+    width: 60%;
+  }
+}
