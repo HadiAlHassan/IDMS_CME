@@ -4,112 +4,274 @@
 # from nltk.tokenize import word_tokenize
 # from nltk.corpus import stopwords
 # from nltk.stem import WordNetLemmatizer
-# from io import BytesIO
 # import re
 # import pandas as pd
+# from io import BytesIO
+# from pathlib import Path
+# from collections import Counter
 
 # def preprocess_text(text):
 #     text = re.sub(r'[^A-Za-z0-9\s]', '', text)
-
 #     tokens = word_tokenize(text)
-
-#     # Convert the tokens to lower case
 #     tokens = [word.lower() for word in tokens]
 
-#     # Remove stop words
+#     # Remove all stop words
 #     stop_words = set(stopwords.words('english'))
 #     tokens = [word for word in tokens if word.isalnum() and word not in stop_words]
-
-#     # Lemmatize the words
 #     lemmatizer = WordNetLemmatizer()
 #     tokens = [lemmatizer.lemmatize(word) for word in tokens]
+#     return tokens
 
-#     # Join tokens to form the preprocessed text
-#     preprocessed_text = ' '.join(tokens)
+# def update_word_frequencies(word_frequencies, new_words):
+#     for word in new_words:
+#         word_frequencies[word] += 1
 
-#     return preprocessed_text
-
-# def generate_word_cloud_from_string(input_string):
+# def generate_word_cloud_from_string(input_string, csv_path, output_path):
 #     # Preprocess the input string
-#     preprocessed_text = preprocess_text(input_string)
+#     preprocessed_tokens = preprocess_text(input_string)
     
-#     # Define the relative path to the CSV file
-#     csv_path = 'Datasets/legal_merged_dataset.csv'
+#     # Read the existing dataset
+#     dataset = pd.read_csv(csv_path)
     
-#     dataset= pd.read_csv(csv_path)
-
+#     # Append the preprocessed string to the 'clean_text' column
+#     new_row = pd.DataFrame({'clean_text': [' '.join(preprocessed_tokens)]})
+#     dataset = pd.concat([dataset, new_row], ignore_index=True)
+    
 #     # Save the updated DataFrame to the CSV file
 #     dataset.to_csv(csv_path, index=False)
     
-#     new_row = pd.DataFrame({'clean_text': [preprocessed_text]})
-#     dataset = pd.concat([dataset, new_row], ignore_index=True)
+#     # Compute word frequencies from the dataset
+#     word_frequencies = Counter()
+#     for text in dataset['clean_text'].dropna():
+#         word_frequencies.update(text.split())
     
-#     dataset.to_csv(csv_path, index=False)
-
-#     combined_text = ' '.join(dataset['clean_text'].dropna().tolist())
+#     # Update word frequencies with the new input string
+#     update_word_frequencies(word_frequencies, preprocessed_tokens)
     
-#     # Generate the word cloud
-#     wordcloud = WordCloud(width=800, height=400, background_color='white').generate(combined_text)
-
-
+#     # Generate the word cloud using the updated word frequencies
+#     wordcloud = WordCloud(width=800, height=400, background_color='white')
+#     wordcloud.generate_from_frequencies(word_frequencies)
+    
 #     # Plot the word cloud
 #     plt.figure(figsize=(10, 5))
 #     plt.imshow(wordcloud, interpolation='bilinear')
 #     plt.axis('off')
-
+    
 #     # Save the plot to a BytesIO object as SVG
 #     img_buffer = BytesIO()
 #     plt.savefig(img_buffer, format='svg')
 #     plt.close()
-
+    
 #     # Get the SVG data from the buffer
 #     img_buffer.seek(0)
 #     svg_data = img_buffer.getvalue().decode('utf-8')
-
+    
 #     # Save the SVG data to a file
-#     output_path = 'wordcloud.svg'
 #     with open(output_path, 'w', encoding='utf-8') as out_file:
 #         out_file.write(svg_data)
-
+    
 #     return output_path
 
-# # Testing the function
-# if __name__ == "__main__":
-#     input_string = "This is Luidovic."
+############Trying 2 #############
 
-#     output_path = generate_word_cloud_from_string(input_string)
-#     print(f"Word cloud saved to {output_path}")
+# import pandas as pd
+# from wordcloud import WordCloud
+# import nltk
+# from nltk.tokenize import word_tokenize
+# from nltk.corpus import stopwords
+# from nltk.stem import WordNetLemmatizer
+# import re
+# from collections import Counter
 
+# # Download necessary NLTK data
+# nltk.download('punkt')
+# nltk.download('stopwords')
+# nltk.download('wordnet')
 
+# def preprocess_text(text):
+#     text = re.sub(r'[^A-Za-z\s]', '', text)  # Remove non-alphanumeric characters
+#     tokens = word_tokenize(text)
+#     tokens = [word.lower() for word in tokens]
+
+#     # Remove stop words and additional unnecessary words
+#     stop_words = set(stopwords.words('english'))
+#     additional_stopwords = {"v", "shall", "may", "etc", "also", "said", "th", "thats"}
+#     stop_words.update(additional_stopwords)
+#     tokens = [word for word in tokens if word.isalnum() and word not in stop_words]
+
+#     lemmatizer = WordNetLemmatizer()
+#     tokens = [lemmatizer.lemmatize(word) for word in tokens]
+#     return tokens
+
+# def generate_word_cloud_from_string(input_string, output_path):
+#     # Preprocess the input string
+#     preprocessed_tokens = preprocess_text(input_string)
+    
+#     # Compute word frequencies from the preprocessed string
+#     word_frequencies = Counter(preprocessed_tokens)
+    
+#     # Generate the word cloud using the word frequencies
+#     wordcloud = WordCloud(
+#         width=1600,
+#         height=800,
+#         background_color='white',
+#         collocations=False,
+#         max_font_size=200,  # Adjust the maximum font size
+#         margin=10,  # Add margin to prevent words from touching
+#         prefer_horizontal=1.0  # Ensure words are placed horizontally
+#     )
+#     wordcloud.generate_from_frequencies(word_frequencies)
+    
+#     # Save the word cloud to an SVG file
+#     svg_data = wordcloud.to_svg()
+#     with open(output_path, 'w', encoding='utf-8') as out_file:
+#         out_file.write(svg_data)
+    
+#     return output_path
+
+# def update_word_frequencies(word_frequencies, new_words):
+#     for word in new_words:
+#         word_frequencies[word] += 1
+
+# def add_string_to_dataset_and_generate_word_cloud(input_string, csv_path, output_path):
+#     # Preprocess the input string
+#     preprocessed_tokens = preprocess_text(input_string)
+    
+#     # Read the existing dataset
+#     dataset = pd.read_csv(csv_path)
+    
+#     # Append the preprocessed string to the 'clean_text' column
+#     new_row = pd.DataFrame({'clean_text': [' '.join(preprocessed_tokens)]})
+#     dataset = pd.concat([dataset, new_row], ignore_index=True)
+    
+#     # Save the updated DataFrame to the CSV file
+#     dataset.to_csv(csv_path, index=False)
+    
+#     # Compute word frequencies from the dataset
+#     word_frequencies = Counter()
+#     for text in dataset['clean_text'].dropna():
+#         word_frequencies.update(text.split())
+    
+#     # Update word frequencies with the new input string
+#     update_word_frequencies(word_frequencies, preprocessed_tokens)
+    
+#     # Generate the word cloud using the updated word frequencies
+#     wordcloud = WordCloud(
+#         width=1600,
+#         height=800,
+#         background_color='white',
+#         collocations=False,
+#         max_font_size=200,  # Adjust the maximum font size
+#         margin=10,  # Add margin to prevent words from touching
+#         prefer_horizontal=1.0  # Ensure words are placed horizontally
+#     )
+#     wordcloud.generate_from_frequencies(word_frequencies)
+    
+#     # Save the word cloud to an SVG file
+#     svg_data = wordcloud.to_svg()
+#     with open(output_path, 'w', encoding='utf-8') as out_file:
+#         out_file.write(svg_data)
+    
+#     return output_path
+
+# # Example usage
+# example_text = """
+# As the Celtics players and coaches spent the week celebrating leading up to the parade, Brad Stevens was back at the Auerbach Center, working out dozens of prospects they could select in the draft this week. They have the 30th and 54th picks and are over the second apron, so they have to nail it on draft night to help build a sustainable team over the coming years.
+
+# That’s why after an evening of popping champagne bottles, the front office was back in the early afternoon to get ready for the future.
+
+# “The day after, as much as we were excited and celebratory and everything else, you’re always thinking about what this means for what’s next,” Stevens said. “I think that’s just maybe the coach in me or maybe that’s just my age.”
+
+# Stevens made a stir last year when the Celtics traded down multiple times on draft night to accumulate a bevy of future second-round picks while selecting Jordan Walsh with the 38th pick. That is not necessarily going to be the norm for this franchise, particularly since bigger deals for Payton Pritchard and potentially Sam Hauser mean the Celtics need to draft more players who have a chance at making the rotation while they are still on their rookie-scale contracts.
+
+# Their long-term depth at center is dubious, considering Al Horford’s age and Kristaps Porziņģis’ forthcoming ankle surgery, expected to happen in the next few weeks.
+
+# “Kristaps is still in the middle of consulting with some different doctors and specialists, but we anticipate surgery will be soon,” he said.
+
+# Because the second apron takes away most of their roster-building tools beyond signing free agents to minimum contracts, getting a center who can develop into a starter down the road most likely would come through the draft. Xavier Tillman and Luke Kornet are both free agents, while Neemias Queta is still under contract, but those players are all far along in their development track.
+
+# That’s why Stevens said they made so many trades last season, since they no longer can aggregate salaries in a trade.
+
+# “It’ll be interesting to see how it affects the league,” Stevens said. “Are there a lot less trades? That will be interesting to follow and look back and study over the next couple of years. As far as the picks go, if the right person is available at 30, we will take him.”
+# """
+
+# # Paths to the CSV file and output SVG files
+# csv_path = 'modules/legal_merged_dataset.csv'
+# output_path_string = 'wordcloud_from_string.svg'
+# output_path_dataset = 'wordcloud_from_dataset.svg'
+
+# # Test the functions
+# generate_word_cloud_from_string(example_text, output_path_string)
+# add_string_to_dataset_and_generate_word_cloud(example_text, csv_path, output_path_dataset)
+
+############# Trying 3 ##################
+import pandas as pd
 from wordcloud import WordCloud
-import matplotlib.pyplot as plt
 import nltk
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 import re
-import pandas as pd
-from io import BytesIO
-from pathlib import Path
 from collections import Counter
+import matplotlib.pyplot as plt
+
+# Download necessary NLTK data
+nltk.download('punkt')
+nltk.download('stopwords')
+nltk.download('wordnet')
 
 def preprocess_text(text):
-    text = re.sub(r'[^A-Za-z0-9\s]', '', text)
+    text = re.sub(r'[^A-Za-z\s]', '', text)  # Remove non-alphanumeric characters
     tokens = word_tokenize(text)
     tokens = [word.lower() for word in tokens]
 
-    # Remove all stop words
+    # Remove stop words and additional unnecessary words
     stop_words = set(stopwords.words('english'))
+    additional_stopwords = {"v", "shall", "may", "etc", "also", "said", "th", "thats"}
+    stop_words.update(additional_stopwords)
     tokens = [word for word in tokens if word.isalnum() and word not in stop_words]
+
     lemmatizer = WordNetLemmatizer()
     tokens = [lemmatizer.lemmatize(word) for word in tokens]
     return tokens
+
+def generate_word_cloud_from_string(input_string, output_path):
+    # Preprocess the input string
+    preprocessed_tokens = preprocess_text(input_string)
+    
+    # Compute word frequencies from the preprocessed string
+    word_frequencies = Counter(preprocessed_tokens)
+    
+    # Generate the word cloud using the word frequencies
+    wordcloud = WordCloud(
+        width=1600,
+        height=800,
+        background_color='white',
+        collocations=False,
+        max_words=200,  # Limit the maximum number of words in the cloud
+        contour_width=3,  # Add contour for better visibility
+        contour_color='steelblue',  # Set contour color
+        prefer_horizontal=1.0,  # Ensure words are placed horizontally
+        max_font_size=300,  # Adjust the maximum font size
+        min_font_size=20,  # Adjust the minimum font size
+        scale=5,  # Increase scale for better resolution
+    )
+    wordcloud.generate_from_frequencies(word_frequencies)
+    
+    # Save the word cloud to a PNG file with high quality
+    plt.figure(figsize=(16, 8))
+    plt.imshow(wordcloud, interpolation='bilinear')
+    plt.axis("off")
+    plt.savefig(output_path, format="png", dpi=1000, bbox_inches='tight')
+    plt.close()
+    
+    return output_path
 
 def update_word_frequencies(word_frequencies, new_words):
     for word in new_words:
         word_frequencies[word] += 1
 
-def generate_word_cloud_from_string(input_string, csv_path, output_path):
+def add_string_to_dataset_and_generate_word_cloud(input_string, csv_path, output_path):
     # Preprocess the input string
     preprocessed_tokens = preprocess_text(input_string)
     
@@ -132,35 +294,56 @@ def generate_word_cloud_from_string(input_string, csv_path, output_path):
     update_word_frequencies(word_frequencies, preprocessed_tokens)
     
     # Generate the word cloud using the updated word frequencies
-    wordcloud = WordCloud(width=800, height=400, background_color='white')
+    wordcloud = WordCloud(
+        width=1600,
+        height=800,
+        background_color='white',
+        collocations=False,
+        max_words=200,  # Limit the maximum number of words in the cloud
+        contour_width=3,  # Add contour for better visibility
+        contour_color='steelblue',  # Set contour color
+        prefer_horizontal=1.0,  # Ensure words are placed horizontally
+        max_font_size=300,  # Adjust the maximum font size
+        min_font_size=20,  # Adjust the minimum font size
+        scale=5,  # Increase scale for better resolution
+    )
     wordcloud.generate_from_frequencies(word_frequencies)
     
-    # Plot the word cloud
-    plt.figure(figsize=(10, 5))
+    # Save the word cloud to a PNG file with high quality
+    plt.figure(figsize=(16, 8))
     plt.imshow(wordcloud, interpolation='bilinear')
-    plt.axis('off')
-    
-    # Save the plot to a BytesIO object as SVG
-    img_buffer = BytesIO()
-    plt.savefig(img_buffer, format='svg')
+    plt.axis("off")
+    plt.savefig(output_path, format="png", dpi=300, bbox_inches='tight')
     plt.close()
-    
-    # Get the SVG data from the buffer
-    img_buffer.seek(0)
-    svg_data = img_buffer.getvalue().decode('utf-8')
-    
-    # Save the SVG data to a file
-    with open(output_path, 'w', encoding='utf-8') as out_file:
-        out_file.write(svg_data)
     
     return output_path
 
-# # Testing the function
-# if __name__ == "__main__":
-#     from pathlib import Path
+# Example usage
+example_text = """
+As the Celtics players and coaches spent the week celebrating leading up to the parade, Brad Stevens was back at the Auerbach Center, working out dozens of prospects they could select in the draft this week. They have the 30th and 54th picks and are over the second apron, so they have to nail it on draft night to help build a sustainable team over the coming years.
 
-#     file_path = Path(__file__).resolve().parent.parent / 'txtfiles' / 'testcase0.txt'
+That’s why after an evening of popping champagne bottles, the front office was back in the early afternoon to get ready for the future.
 
-#     with open(file_path, 'r', encoding='utf-8') as file:
-#         output_path = generate_word_cloud_from_file(file)
-#         print(f"Word cloud saved to {output_path}")
+“The day after, as much as we were excited and celebratory and everything else, you’re always thinking about what this means for what’s next,” Stevens said. “I think that’s just maybe the coach in me or maybe that’s just my age.”
+
+Stevens made a stir last year when the Celtics traded down multiple times on draft night to accumulate a bevy of future second-round picks while selecting Jordan Walsh with the 38th pick. That is not necessarily going to be the norm for this franchise, particularly since bigger deals for Payton Pritchard and potentially Sam Hauser mean the Celtics need to draft more players who have a chance at making the rotation while they are still on their rookie-scale contracts.
+
+Their long-term depth at center is dubious, considering Al Horford’s age and Kristaps Porziņģis’ forthcoming ankle surgery, expected to happen in the next few weeks.
+
+“Kristaps is still in the middle of consulting with some different doctors and specialists, but we anticipate surgery will be soon,” he said.
+
+Because the second apron takes away most of their roster-building tools beyond signing free agents to minimum contracts, getting a center who can develop into a starter down the road most likely would come through the draft. Xavier Tillman and Luke Kornet are both free agents, while Neemias Queta is still under contract, but those players are all far along in their development track.
+
+That’s why Stevens said they made so many trades last season, since they no longer can aggregate salaries in a trade.
+
+“It’ll be interesting to see how it affects the league,” Stevens said. “Are there a lot less trades? That will be interesting to follow and look back and study over the next couple of years. As far as the picks go, if the right person is available at 30, we will take him.”
+"""
+
+# Paths to the CSV file and output PNG files
+csv_path = 'modules/legal_merged_dataset.csv'
+output_path_string = 'wordcloud_from_string.png'
+output_path_dataset = 'wordcloud_from_dataset.png'
+
+# Test the functions
+generate_word_cloud_from_string(example_text, output_path_string)
+add_string_to_dataset_and_generate_word_cloud(example_text, csv_path, output_path_dataset)
