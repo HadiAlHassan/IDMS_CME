@@ -13,5 +13,6 @@ urlpatterns = [ #redirects to api/views.py
     path('handle-selected-pdfs', pdf_handling.handle_selected_pdfs, name='handle_selected_pdfs'),
     path('get_metadata_by_pdf_name', pdf_handling.get_metadata_by_pdf_name, name='get_metadata_by_pdf_name'),
     path('scrape-website', WS_handling.scrape_website, name='scrape_website'),
-    path('chat-bot', chat_bot.chatbot, name='chat_bot')
+    path('chat-bot', chat_bot.chatbot, name='chat_bot'),
+    path('get-all-metadata',pdf_handling.get_all_metadata, name="get_all_metadata")
 ]

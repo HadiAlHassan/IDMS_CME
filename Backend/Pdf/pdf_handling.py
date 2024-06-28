@@ -164,3 +164,34 @@ def get_metadata_by_pdf_name(request):
         return Response({'message': 'PDFs found', 'pdf_metadata': metadata_list})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
+    
+@timing_decorator
+@api_view(['GET'])
+def get_all_metadata(request):
+    try:
+        db = connect_to_mongo()
+        general_info_collection = db['general_info']
+        nlp_analysis_collection = db['nlp_analysis']
+        
+        general_info_docs = list(general_info_collection.find())
+        nlp_analysis_docs = list(nlp_analysis_collection.find())
+        combined_data = {}
+
+        for doc in general_info_docs:
+            nlp_id = doc.get('nlp_id')
+            if nlp_id:
+                combined_data[nlp_id] = combined_data.get(nlp_id, {})
+                combined_data[nlp_id].update(doc)
+
+        # Process nlp_analysis documents
+        for doc in nlp_analysis_docs:
+            nlp_id = doc.get('nlp_id')
+            if nlp_id:
+                combined_data[nlp_id] = combined_data.get(nlp_id, {})
+                combined_data[nlp_id].update(doc)
+
+        # Convert combined data to a list
+        combined_data_list = list(combined_data.values())
+        return JsonResponse(combined_data_list, safe=False)
+    except pymongo_errors.PyMongoError as e:
+        return HttpResponse(f'Database error: {str(e)}', status=500)

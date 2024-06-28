@@ -4,6 +4,7 @@ import ListPdfs from "./components/Pdf/ListPdfs";
 import WebScrapButton from "./components/Webscraping/WebScrapButton";
 import Dashboard from "./components/Dashboard/Dashboard";
 import FloatingActionButton from "./components/ChatBot/ChatIcon";
+import BasicModal from "./components/Pdf/Modal";
 import { UpdateProvider } from "./components/Context/UpdateContext";
 import { Container } from "@mui/material";
 import "./index.css";
@@ -22,6 +23,9 @@ function HomePage() {
             </div>
             <div className="WebScrapContainer">
               <WebScrapButton />
+            </div>
+            <div>
+              <BasicModal />
             </div>
           </div>
           <div className="dashboard">

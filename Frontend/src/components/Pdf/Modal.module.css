@@ -1,0 +1,22 @@
+.modalContainer {
+  position: relative !important;
+  padding: 1rem !important;
+  width: 60rem;
+  height: 40rem;
+  margin: 2rem auto;
+  border-radius: 1rem !important;
+  margin-bottom: 15rem !important;
+}
+@media (max-width: 1012px) {
+  .modalContainer {
+    position: relative;
+    padding: 1rem !important;
+    width: 40rem;
+    height: 30rem;
+    margin: 2rem auto;
+    border-radius: 1rem !important;
+  }
+}
+
+.dataGridContainer {
+}
