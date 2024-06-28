@@ -34,12 +34,14 @@ def add_pdf(request):
             return Response({'error': 'File already exists'}, status=400)
         
         file_id = fs.put(pdf_file, filename=pdf_file.name)
-        
+        title = pdf_file.name
         metadata_dict = extract_metadata_pdf(pdf_file)
+        if metadata_dict['title'] != "No title found":
+            title = metadata_dict["title"]
         with transaction.atomic():
             general_info_data = {
                 'source': 'PDF',
-                'title': metadata_dict['title'],
+                'title': title,
                 'author': metadata_dict['author']
             }
             general_info_serializer = DocGeneralInfoSerializer(data=general_info_data)
