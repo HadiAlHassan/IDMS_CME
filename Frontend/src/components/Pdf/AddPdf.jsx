@@ -2,13 +2,15 @@ import { Button } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import classes from "./AddPdf.module.css";
 import SuccessAlerts from "../Alert/Success";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import ErrorAlerts from "../Alert/Error";
+import { UpdateContext } from "../Context/UpdateContext";
 
 function AddPdf() {
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const { handleFileUploadSuccess } = useContext(UpdateContext);
 
   function clickHandler() {
     const fileInput = document.createElement("input");
@@ -33,6 +35,7 @@ function AddPdf() {
         console.log("Server response:", result);
         setShowSuccessAlert(true);
         setTimeout(() => setShowSuccessAlert(false), 5000);
+        handleFileUploadSuccess();
       } else {
         console.error("Server error:", result);
         setShowErrorAlert(true);

@@ -4,30 +4,33 @@ import ListPdfs from "./components/Pdf/ListPdfs";
 import WebScrapButton from "./components/Webscraping/WebScrapButton";
 import Dashboard from "./components/Dashboard/Dashboard";
 import FloatingActionButton from "./components/ChatBot/ChatIcon";
+import { UpdateProvider } from "./components/Context/UpdateContext";
 import { Container } from "@mui/material";
 import "./index.css";
 
 function HomePage() {
   return (
-    <div className="Homepage">
-      <Container>
-        <div className="flexContainer">
-          <div className="addPdfContainer">
-            <AddPdf />
+    <UpdateProvider>
+      <div className="Homepage">
+        <Container>
+          <div className="flexContainer">
+            <div className="addPdfContainer">
+              <AddPdf />
+            </div>
+            <div className="viewPdfContainer">
+              <ListPdfs />
+            </div>
+            <div className="WebScrapContainer">
+              <WebScrapButton />
+            </div>
           </div>
-          <div className="viewPdfContainer">
-            <ListPdfs />
+          <div className="dashboard">
+            <Dashboard />
           </div>
-          <div className="WebScrapContainer">
-            <WebScrapButton />
-          </div>
-        </div>
-        <div className="dashboard">
-          <Dashboard />
-        </div>
-      </Container>
-      <FloatingActionButton />
-    </div>
+        </Container>
+        <FloatingActionButton />
+      </div>
+    </UpdateProvider>
   );
 }
 export default HomePage;

@@ -53,7 +53,7 @@ def add_pdf(request):
             category = "Other"
             ner = {}
             if content != "":
-                test_word_cloud(content)
+                
                 category = predict_label_from_string(content)
                 ner = extract_entities_from_text(content)
             nlp_analysis_data = {
@@ -72,6 +72,7 @@ def add_pdf(request):
             nlp_analysis_serializer = NlpAnalysisSerializer(data=nlp_analysis_data)
             if nlp_analysis_serializer.is_valid():
                 nlp_analysis_serializer.save()
+                test_word_cloud(content)
             else:
                 
                 return Response({'error': 'Failed to add NlpAnalysis', 'details': nlp_analysis_serializer.errors}, status=400)

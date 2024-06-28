@@ -1,6 +1,6 @@
 import React from "react";
 import Modal from "@mui/material/Modal";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import classes from "./WebScrapingModal.module.css";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
@@ -8,12 +8,14 @@ import { Button } from "@mui/material";
 import axios from "axios";
 import SuccessAlerts from "../Alert/Success";
 import ErrorAlerts from "../Alert/Error";
+import { UpdateContext } from "../Context/UpdateContext";
 
 function WsModal(props) {
   const handleClose = () => props.setOpen(false);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const { handleFileUploadSuccess } = useContext(UpdateContext);
   function handleScrape() {
     console.log(
       "Scraping website:",
@@ -28,6 +30,7 @@ function WsModal(props) {
         console.log("Scraped website:", response.data);
         setShowSuccessAlert(true);
         setTimeout(() => setShowSuccessAlert(false), 5000);
+        handleFileUploadSuccess(); // Call this to update the word cloud
       })
       .catch((error) => {
         console.error("Error scraping website:", error);

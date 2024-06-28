@@ -397,7 +397,6 @@ class Scraper:
             file_id = fs.put(content.encode('utf-8'), filename=filtered_filename)
             content = get_text_from_txt(file_id)
             if content!="":
-                    test_word_cloud(content)
                     category = predict_label_from_string(content)
                     ner = extract_entities_from_text(content)
                     metadata_dict = extract_metadata_text(content)
@@ -437,6 +436,7 @@ class Scraper:
             nlp_analysis_serializer = NlpAnalysisSerializer(data=nlp_analysis_data)
             if nlp_analysis_serializer.is_valid():
                 nlp_analysis_serializer.save()
+                test_word_cloud(content)
             else:
                 raise ScrapingException("Error in saving document general info to MongoDB")
             
