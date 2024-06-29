@@ -5,17 +5,20 @@ import { styled, css } from "@mui/system";
 import { Modal as BaseModal } from "@mui/base/Modal";
 import SearchIcon from "@mui/icons-material/Search";
 import Button from "@mui/material/Button";
-import DataGrid from "./DataGrid";
+import BasicExampleDataGrid from "./DataGrid";
 import classes from "./Modal.module.css";
+
 export default function BasicModal() {
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   return (
     <div>
       <Button
-        // className={classes.button}
+        className={classes.viewPdfButton}
         variant="contained"
         startIcon={<SearchIcon />}
         onClick={handleOpen}
@@ -45,11 +48,12 @@ export default function BasicModal() {
           >
             X
           </Button>
-          <h3>Search for a PDF</h3>
+          <h3>
+            Search for a PDF : <span>(Double click a row to open a pdf)</span>
+          </h3>
           <div className={classes.dataGridContainer}>
-            <DataGrid />
+            <BasicExampleDataGrid />
           </div>
-          <Button variant="contained">VIEW PDF</Button>
         </ModalContent>
       </Modal>
     </div>

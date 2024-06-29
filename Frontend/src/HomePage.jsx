@@ -1,6 +1,6 @@
 import React from "react";
 import AddPdf from "./components/Pdf/AddPdf";
-import ListPdfs from "./components/Pdf/ListPdfs";
+
 import WebScrapButton from "./components/Webscraping/WebScrapButton";
 import Dashboard from "./components/Dashboard/Dashboard";
 import FloatingActionButton from "./components/ChatBot/ChatIcon";
@@ -19,13 +19,10 @@ function HomePage() {
               <AddPdf />
             </div>
             <div className="viewPdfContainer">
-              <ListPdfs />
+              <BasicModal />
             </div>
             <div className="WebScrapContainer">
               <WebScrapButton />
-            </div>
-            <div>
-              <BasicModal />
             </div>
           </div>
           <div className="dashboard">

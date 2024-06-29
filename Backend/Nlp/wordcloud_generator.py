@@ -12,6 +12,9 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 
+nltk.download('punkt') 
+nltk.download('stopwords') 
+nltk.download('wordnet')
 def preprocess_text(text):
     text = re.sub(r'[^A-Za-z0-9\s]', '', text)
     tokens = word_tokenize(text)

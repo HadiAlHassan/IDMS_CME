@@ -165,6 +165,8 @@ def get_metadata_by_pdf_name(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
     
+from bson import ObjectId
+
 @timing_decorator
 @api_view(['GET'])
 def get_all_metadata(request):
@@ -177,9 +179,11 @@ def get_all_metadata(request):
         nlp_analysis_docs = list(nlp_analysis_collection.find())
         combined_data = {}
 
+        # Process general_info documents
         for doc in general_info_docs:
             nlp_id = doc.get('nlp_id')
             if nlp_id:
+                doc['_id'] = str(doc['_id'])  # Convert ObjectId to string
                 combined_data[nlp_id] = combined_data.get(nlp_id, {})
                 combined_data[nlp_id].update(doc)
 
@@ -187,11 +191,15 @@ def get_all_metadata(request):
         for doc in nlp_analysis_docs:
             nlp_id = doc.get('nlp_id')
             if nlp_id:
+                if isinstance(nlp_id, dict) and '$numberLong' in nlp_id:
+                    nlp_id = int(nlp_id['$numberLong'])
+                doc['_id'] = str(doc['_id'])  # Convert ObjectId to string
                 combined_data[nlp_id] = combined_data.get(nlp_id, {})
                 combined_data[nlp_id].update(doc)
 
         # Convert combined data to a list
         combined_data_list = list(combined_data.values())
+
         return JsonResponse(combined_data_list, safe=False)
     except pymongo_errors.PyMongoError as e:
         return HttpResponse(f'Database error: {str(e)}', status=500)

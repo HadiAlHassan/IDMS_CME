@@ -2,21 +2,29 @@
   position: relative !important;
   padding: 1rem !important;
   width: 60rem;
-  height: 40rem;
+
   margin: 2rem auto;
   border-radius: 1rem !important;
-  margin-bottom: 15rem !important;
 }
 @media (max-width: 1012px) {
   .modalContainer {
     position: relative;
     padding: 1rem !important;
     width: 40rem;
-    height: 30rem;
     margin: 2rem auto;
     border-radius: 1rem !important;
   }
 }
 
-.dataGridContainer {
+.viewPdfButton.viewPdfButton {
+  border-radius: 0.7rem;
+  background-color: #1769aa;
+  padding: 0.7rem;
+  font-size: 0.9rem;
+  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
 }
