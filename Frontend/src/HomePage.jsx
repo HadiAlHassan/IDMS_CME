@@ -1,7 +1,7 @@
 import React from "react";
 import AddPdf from "./components/Pdf/AddPdf";
 
-import WebScrapButton from "./components/Webscraping/WebScrapButton";
+import WebScrapingModal from "./components/Webscraping/WsModal";
 import Dashboard from "./components/Dashboard/Dashboard";
 import FloatingActionButton from "./components/ChatBot/ChatIcon";
 import BasicModal from "./components/Pdf/Modal";
@@ -22,7 +22,7 @@ function HomePage() {
               <BasicModal />
             </div>
             <div className="WebScrapContainer">
-              <WebScrapButton />
+              <WebScrapingModal />
             </div>
           </div>
           <div className="dashboard">
