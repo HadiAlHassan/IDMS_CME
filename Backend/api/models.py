@@ -1,4 +1,5 @@
 from djongo import models
+from Utils.db import connect_to_mongo
 import random
 
 class DocGeneralInfo(models.Model):
@@ -74,3 +75,47 @@ class NlpAnalysis(models.Model):
     
     class Meta:
         db_table = 'nlp_analysis'
+
+    def save(self, *args, **kwargs):
+        if not self._state.adding:  # If updating an existing document
+            previous = NlpAnalysis.objects.get(pk=self.pk)
+            if previous.category != self.category:
+                self.decrement_category_count(previous.category)
+                self.increment_category_count(self.category)
+        else:
+            self.increment_category_count(self.category)
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        self.decrement_category_count(self.category)
+        super().delete(*args, **kwargs)
+
+    @staticmethod
+    def increment_category_count(category):
+        db = connect_to_mongo()
+        category_document_count = db['category_document_count']
+        category_document_count.update_one(
+            {'category': category},
+            {'$inc': {'document_count': 1}},
+            upsert=True
+        )
+
+    @staticmethod
+    def decrement_category_count(category):
+        db = connect_to_mongo()
+        category_document_count = db['category_document_count']
+        category_document_count.update_one(
+            {'category': category},
+            {'$inc': {'document_count': -1}}
+        )
+
+class CategoryDocumentCount(models.Model):
+    _id = models.ObjectIdField(primary_key=True)
+    category = models.CharField(max_length=100, unique=True)
+    document_count = models.IntegerField()
+
+    class Meta:
+        db_table = 'category_document_count'
+
+
+
