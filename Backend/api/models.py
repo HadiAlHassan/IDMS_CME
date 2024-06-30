@@ -57,6 +57,7 @@ class NlpAnalysis(models.Model):
         ('Court Case', 'Business'),
         ('Agreement', 'Agreement'),
         ('Sport', 'Sport'),
+        ('Business', 'Business'),
         ('Other','Other')
         # Add other categories as needed
     ]

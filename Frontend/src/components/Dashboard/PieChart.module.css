@@ -29,3 +29,9 @@
     font-size: 12px; /* Adjust legend size for smaller screens */
   }
 }
+
+.noData {
+  color: #f2f2f2;
+  font-size: 1.5rem !important;
+  text-align: center;
+}

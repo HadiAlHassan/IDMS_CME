@@ -1,42 +1,66 @@
-import React from "react";
+import React, { useState, useEffect, useContext } from "react";
 import classes from "./PieChart.module.css";
 import { PieChart } from "@mui/x-charts/PieChart";
-
+import axios from "axios";
+import { UpdateContext } from "../Context/UpdateContext";
+import { Typography } from "@mui/material";
 function PieChartComponent() {
-  const data = [
-    { id: 0, value: 20, label: "Agreement" },
-    { id: 1, value: 20, label: "Court Case" },
-    { id: 2, value: 10, label: "Contract" },
-    { id: 3, value: 10, label: "Technology" },
-    { id: 4, value: 10, label: "Politics" },
-    { id: 5, value: 10, label: "Sport" },
-    { id: 6, value: 19, label: "Business", color: "#8E44AD" },
-  ];
+  const [data, setData] = useState([]);
+  const { updatePieChart } = useContext(UpdateContext);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8000/api/category-document-count"
+        );
+        const fetchedData = response.data.map((item, index) => ({
+          id: index,
+          value: item.document_count,
+          label: item.category,
+        }));
+        setData(fetchedData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, [updatePieChart]); // Re-fetch data when updatePieChart changes
 
   return (
     <>
       <h2 className={classes.title}>Documents Category</h2>
       <div className={classes.pieChartContainer}>
-        <PieChart
-          series={[
-            {
-              data,
-              highlightScope: { faded: "global", highlighted: "item" },
-              faded: { innerRadius: 30, additionalRadius: -30, color: "gray" },
-            },
-          ]}
-          slotProps={{
-            legend: {
-              labelStyle: {
-                fontSize: 14,
-                fill: "white",
+        {data.length === 0 ? (
+          <Typography className={classes.noData}>No data inserted</Typography>
+        ) : (
+          <PieChart
+            series={[
+              {
+                data,
+                highlightScope: { faded: "global", highlighted: "item" },
+                faded: {
+                  innerRadius: 30,
+                  additionalRadius: -30,
+                  color: "gray",
+                },
               },
-            },
-          }}
-          height={250}
-        />
+            ]}
+            slotProps={{
+              legend: {
+                labelStyle: {
+                  fontSize: 14,
+                  fill: "white",
+                },
+              },
+            }}
+            height={250}
+          />
+        )}
       </div>
     </>
   );
 }
+
 export default PieChartComponent;

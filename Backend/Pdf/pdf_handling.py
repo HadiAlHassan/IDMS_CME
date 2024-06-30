@@ -16,6 +16,7 @@ from Nlp.wordcloud_generator_testing import test_word_cloud
 from Nlp.categorization import predict_label_from_string
 from Nlp.name_entity_recognition import extract_entities_from_text
 from Nlp.nlp_analysis import extract_metadata_pdf
+from api.models import CategoryDocumentCount
 
 @timing_decorator
 @api_view(['POST'])
@@ -203,3 +204,11 @@ def get_all_metadata(request):
         return JsonResponse(combined_data_list, safe=False)
     except pymongo_errors.PyMongoError as e:
         return HttpResponse(f'Database error: {str(e)}', status=500)
+    
+
+
+@timing_decorator
+@api_view(['GET'])
+def category_document_count(request):
+    data = list(CategoryDocumentCount.objects.values('category', 'document_count'))
+    return JsonResponse(data, safe=False)
