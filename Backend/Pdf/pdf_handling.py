@@ -1,3 +1,4 @@
+import logging
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -170,7 +171,7 @@ def get_metadata_by_pdf_name(request):
                     'nlp_analysis': nlp_info
                 }
                 metadata_list.append(combined_metadata)
-
+        logging.info(f"Combined Metadata: {metadata_list}")
         return Response({'message': 'PDFs found', 'pdf_metadata': metadata_list})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)

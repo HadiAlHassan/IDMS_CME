@@ -15,6 +15,7 @@
 .Header:hover {
   box-shadow: 0 5px 10px 0 rgba(56, 56, 56, 0.2);
 }
+
 @media (max-width: 768px) {
   .TitleWebsite {
     font-size: 1em;

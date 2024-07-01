@@ -40,6 +40,7 @@ const PdfViewer = () => {
   };
 
   const formatMetadata = (data) => {
+    if (!data) return null;
     return Object.entries(data).map(([key, value]) => (
       <tr key={key}>
         <td className={classes.metadataKey}>{formatKey(key)}</td>
@@ -75,6 +76,7 @@ const PdfViewer = () => {
           className={classes.pdfDocument}
           height="100%"
           width="100%"
+          title="PDF Viewer"
         ></iframe>
       </div>
     </div>

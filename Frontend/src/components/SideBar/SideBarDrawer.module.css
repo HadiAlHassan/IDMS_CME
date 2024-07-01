@@ -1,0 +1,64 @@
+.sideBarButton {
+  color: #f2f2f2 !important;
+  border-radius: 0.7rem !important;
+  background-color: #3494e3 !important;
+  padding: 0.7rem !important;
+  font-size: 0.9rem !important;
+  font-family: Inter, Avenir, Helvetica, Arial, sans-serif !important;
+  font-synthesis: none !important;
+  text-rendering: optimizeLegibility !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  -webkit-text-size-adjust: 100% !important;
+  position: absolute !important; /* Updated position */
+  top: 2rem !important; /* Adjust as needed */
+  left: 1rem !important;
+  transition: background-color 0.3s ease, transform 0.1s ease; /* Add smooth transitions */
+}
+
+.sideBarButton:hover {
+  background-color: #2b82c1 !important; /* Darken background on hover */
+  transform: scale(1.05);
+}
+
+.sideBarButton:active {
+  background-color: #1e5b8b !important; /* Darken background more on click */
+  transform: scale(0.95); /* Slightly shrink the button on click */
+}
+.sideBar {
+  width: 300px; /* Adjust width as needed */
+  padding: 1rem;
+  background-color: #f7f7f7; /* Light grey background */
+  height: 100%; /* Full height */
+  overflow-y: auto; /* Scroll if content is longer than the sidebar height */
+}
+
+.newsItem {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.newsItem img {
+  max-width: 100%;
+  height: auto;
+  margin-top: 0.5rem;
+  border-radius: 0.5rem;
+}
+
+.newsItem a {
+  font-weight: bold;
+  color: #000000;
+  text-decoration: none;
+}
+
+.newsItem a:hover {
+  text-decoration: underline;
+}
+
+.sideBarHeader {
+  font-size: 1.5rem;
+  color: #000000;
+  margin-bottom: 1rem;
+  text-align: center;
+}

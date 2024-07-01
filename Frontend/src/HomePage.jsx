@@ -1,6 +1,5 @@
 import React from "react";
 import AddPdf from "./components/Pdf/AddPdf";
-
 import WebScrapingModal from "./components/Webscraping/WsModal";
 import Dashboard from "./components/Dashboard/Dashboard";
 import FloatingActionButton from "./components/ChatBot/ChatIcon";
@@ -8,11 +7,13 @@ import BasicModal from "./components/Pdf/Modal";
 import { UpdateProvider } from "./components/Context/UpdateContext";
 import { Container } from "@mui/material";
 import "./index.css";
+import SideBarDrawer from "./components/SideBar/SideBarDrawer";
 
 function HomePage() {
   return (
     <UpdateProvider>
       <div className="Homepage">
+        <SideBarDrawer />
         <Container>
           <div className="flexContainer">
             <div className="addPdfContainer">
