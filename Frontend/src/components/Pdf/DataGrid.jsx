@@ -77,6 +77,7 @@ const BasicExampleDataGrid = () => {
         return;
       }
 
+      // Ensure metadata is an object containing general_info and nlp_analysis keys
       const viewerUrl = `/view-pdf?url=${encodeURIComponent(
         pdfUrl
       )}&metadata=${encodeURIComponent(JSON.stringify(metadata))}`;

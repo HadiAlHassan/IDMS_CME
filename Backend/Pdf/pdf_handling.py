@@ -7,9 +7,10 @@ from bson.objectid import ObjectId
 from pymongo import errors as pymongo_errors
 from django.db import transaction
 import datetime 
+from bson import ObjectId
 
 from Utils.db import connect_to_mongo, connect_to_gridfs
-from Utils.helper_functions import get_file_id_by_name, get_metadata, get_text_from_pdf
+from Utils.helper_functions import get_file_id_by_name, get_general_info_metadata, get_nlp_analysis_metadata, get_text_from_pdf
 from api.serializers import DocGeneralInfoSerializer, NlpAnalysisSerializer
 from Utils.decorators import timing_decorator
 from Nlp.wordcloud_generator_testing import test_word_cloud
@@ -157,16 +158,24 @@ def get_metadata_by_pdf_name(request):
         selected_pdfs = data.get('selectedPdfs')
 
         if len(selected_pdfs) == 0:
-            return Response({'message': 'No PDFs selected'}, status=200)  
+            return Response({'message': 'No PDFs selected'}, status=200)
 
         metadata_list = []
         for pdf_name in selected_pdfs:
-            metadata_list.extend(get_metadata(pdf_name))
+            general_info_metadata = get_general_info_metadata(pdf_name)
+            nlp_analysis_metadata = get_nlp_analysis_metadata(pdf_name)
+            for gen_info, nlp_info in zip(general_info_metadata, nlp_analysis_metadata):
+                combined_metadata = {
+                    'general_info': gen_info,
+                    'nlp_analysis': nlp_info
+                }
+                metadata_list.append(combined_metadata)
+
         return Response({'message': 'PDFs found', 'pdf_metadata': metadata_list})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
     
-from bson import ObjectId
+
 
 @timing_decorator
 @api_view(['GET'])

@@ -4,10 +4,8 @@ import fitz
 from bson import ObjectId
 
 from Utils.db import connect_to_mongo, connect_to_gridfs
-from api.models import DocGeneralInfo
-from api.serializers import DocGeneralInfoSerializer
-
-
+from api.models import DocGeneralInfo , NlpAnalysis
+from api.serializers import DocGeneralInfoSerializer, NlpAnalysisSerializer
 def get_file_id_by_name(file_name):
     try:
         db = connect_to_mongo()
@@ -19,9 +17,14 @@ def get_file_id_by_name(file_name):
     except errors.PyMongoError as e:
         return str(e)
 
-def get_metadata(pdf_title):
+def get_general_info_metadata(pdf_title):
     docs = DocGeneralInfo.objects.filter(title__icontains=pdf_title)
     serializer = DocGeneralInfoSerializer(docs, many=True)
+    return serializer.data
+
+def get_nlp_analysis_metadata(pdf_title):
+    docs = NlpAnalysis.objects.filter(nlp_id__in=DocGeneralInfo.objects.filter(title__icontains=pdf_title).values_list('nlp_id', flat=True))
+    serializer = NlpAnalysisSerializer(docs, many=True)
     return serializer.data
 
 
