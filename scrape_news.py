@@ -50,7 +50,12 @@ def get_reuters_news():
             else:
                 img_url = ''
 
-            html_string += f"<li><a href='{full_link}' target='_blank'>{headline}</a><br><img src='{img_url}' alt='Image for {headline}' style='max-width:200px;'><br><br></li>"
+            html_string += f"\
+                <li> \
+                <a href='{full_link}' target='_blank'>{headline}</a>\
+                <br><img src='{img_url}' alt='Image for {headline}' style='max-width:200px;'>\
+                <br><br>\
+                </li>"
 
     html_string += "</ul></html>"
 
