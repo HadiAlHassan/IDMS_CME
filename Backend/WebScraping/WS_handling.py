@@ -4,6 +4,7 @@ from WebScraping.ScrapingException import ScrapingException  # Ensure this impor
 
 from Utils.decorators import timing_decorator
 from WebScraping.Scraper import Scraper
+from WebScraping.scrape_news import get_reuters_news
 
 @timing_decorator
 @api_view(['POST'])
@@ -19,3 +20,13 @@ def scrape_website(request):
         return Response({'error': str(e)}, status=400)
     except Exception as e:
         return Response({'error': str(e)}, status=500)
+
+
+@timing_decorator
+@api_view(['GET'])
+def get_news(request):
+    try: 
+        html_string = get_reuters_news()
+        return Response({'news': html_string}, status=200)
+    except Exception as e:
+        return Response({'error': str(e)}, status=400)

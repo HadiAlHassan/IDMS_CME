@@ -15,5 +15,6 @@ urlpatterns = [ #redirects to api/views.py
     path('scrape-website', WS_handling.scrape_website, name='scrape_website'),
     path('chat-bot', chat_bot.chatbot, name='chat_bot'),
     path('get-all-metadata',pdf_handling.get_all_metadata, name="get_all_metadata"),
-    path('category-document-count', pdf_handling.category_document_count, name='category_document_count')
+    path('category-document-count', pdf_handling.category_document_count, name='category_document_count'),
+    path('get-news', WS_handling.get_news, name="get_news")
 ]
