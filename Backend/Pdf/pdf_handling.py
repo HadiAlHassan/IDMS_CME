@@ -18,6 +18,7 @@ from Nlp.categorization import predict_label_from_string
 from Nlp.name_entity_recognition import extract_entities_from_text
 from Nlp.nlp_analysis import extract_metadata_pdf
 from api.models import CategoryDocumentCount
+from Nlp.nlp_analysis_optimized import extract_metadata, summarize_pdf
 
 @timing_decorator
 @api_view(['POST'])
@@ -29,17 +30,22 @@ def add_pdf(request):
         
         if not pdf_file.name.endswith('.pdf'):
             return Response({'error': 'Invalid file type'}, status=400)
-        
         fs = connect_to_gridfs()
+        db = connect_to_mongo()
+        
         existing_file = fs.find_one({'filename': pdf_file.name})
         if existing_file:
             return Response({'error': 'File already exists'}, status=400)
         
         file_id = fs.put(pdf_file, filename=pdf_file.name)
         title = pdf_file.name
-        metadata_dict = extract_metadata_pdf(pdf_file)
+        metadata_dict1 = extract_metadata_pdf(pdf_file)
+        metadata_dict = extract_metadata(pdf_file)
+        print(metadata_dict["title"])
         if metadata_dict['title'] != "No title found":
             title = metadata_dict["title"]
+
+        db.fs.files.update_one({'_id': file_id}, {'$set': {'filename': title}})
         with transaction.atomic():
             general_info_data = {
                 'source': 'PDF',
@@ -57,21 +63,21 @@ def add_pdf(request):
             category = "Other"
             ner = {}
             if content != "":
-                
                 category = predict_label_from_string(content)
                 ner = extract_entities_from_text(content)
+            
             nlp_analysis_data = {
                 'nlp_id': general_info.nlp_id,
                 'document_type': 'PDF',
-                'summary': metadata_dict["summary"],  # Add your summarization logic here
+                'summary': summarize_pdf(pdf_file),  # Add your summarization logic here
                 'category': category,  # Example category, change as needed
-                'language': metadata_dict["language"],  # Example language, change as needed
+                'language': "en",  # Example language, change as needed  metadata_dict1["language"]
                 'ner': ner,  
-                'confidentiality_level': metadata_dict["confidentiality"],  # Example confidentiality level, change as needed
-                'location': metadata_dict["locations"],  # Example location, change as needed
-                'references': metadata_dict["references"],
-                'in_text_citations': metadata_dict["in_text_citations"],  # Example uploader, change as needed
-                'word_count': metadata_dict["word_count"]
+                'confidentiality_level': metadata_dict1["confidentiality"],  # Example confidentiality level, change as needed
+                'location': metadata_dict1["locations"],  # Example location, change as needed
+                'references': metadata_dict1["references"],
+                'in_text_citations': metadata_dict1["in_text_citations"],  # Example uploader, change as needed
+                'word_count': metadata_dict1["word_count"]
             }
             nlp_analysis_serializer = NlpAnalysisSerializer(data=nlp_analysis_data)
             if nlp_analysis_serializer.is_valid():
@@ -105,6 +111,7 @@ def get_pdf_by_id(request, file_id):
 @api_view(['GET'])
 def get_pdf_by_name(request, file_name):
     file_id = get_file_id_by_name(file_name)
+    print("ahlennnn ana honnn \n\n", file_id)
     if file_id:
         return redirect('get_pdf_by_id', file_id=file_id)
     else:
@@ -135,6 +142,7 @@ def handle_selected_pdfs(request):
         
         pdf_file_ids = []
         for pdf_name in selected_pdfs:
+            print(pdf_name)
             file_id = get_file_id_by_name(pdf_name)
             if file_id:
                 pdf_file_ids.append(file_id)
@@ -142,6 +150,7 @@ def handle_selected_pdfs(request):
                 return Response({'error': f'File not found: {pdf_name}'}, status=404)
 
         pdf_urls = [request.build_absolute_uri(reverse('get_pdf_by_id', args=[file_id])) for file_id in pdf_file_ids]
+        print(pdf_urls)
         
         return Response({'message': 'PDFs found', 'pdfUrls': pdf_urls})  # Corrected this line by adding the missing parenthesis
     except Exception as e:
@@ -152,15 +161,23 @@ def handle_selected_pdfs(request):
 def get_metadata_by_pdf_name(request):
     try:
         data = request.data
-        selected_pdfs = data.get('selectedPdfs')
+        print("Request data:", data)
+        selected_pdfs = data.get('selectedPdfs', [])
 
         if len(selected_pdfs) == 0:
             return Response({'message': 'No PDFs selected'}, status=200)
 
         metadata_list = []
         for pdf_name in selected_pdfs:
+            print(f"Processing PDF: {pdf_name}")
             general_info_metadata = get_general_info_metadata(pdf_name)
             nlp_analysis_metadata = get_nlp_analysis_metadata(pdf_name)
+            
+            if not general_info_metadata:
+                print(f"No general info metadata found for: {pdf_name}")
+            if not nlp_analysis_metadata:
+                print(f"No NLP analysis metadata found for: {pdf_name}")
+
             for gen_info, nlp_info in zip(general_info_metadata, nlp_analysis_metadata):
                 combined_metadata = {
                     'general_info': gen_info,
@@ -168,7 +185,7 @@ def get_metadata_by_pdf_name(request):
                 }
                 metadata_list.append(combined_metadata)
 
-        return Response({'message': 'PDFs found', 'pdf_metadata': metadata_list})
+        return Response({'message': 'PDFs found', 'pdf_metadata': metadata_list}, status=200)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
     
