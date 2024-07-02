@@ -81,9 +81,6 @@ def add_pdf(request):
                 
                 return Response({'error': 'Failed to add NlpAnalysis', 'details': nlp_analysis_serializer.errors}, status=400)
         
-        
-        
-        
         return Response({'message': 'PDF, metadata, and NLP_analysis added successfully', 'file_id': str(file_id)})
         
     except pymongo_errors.PyMongoError as e:

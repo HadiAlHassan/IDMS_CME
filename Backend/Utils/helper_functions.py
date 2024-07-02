@@ -37,6 +37,7 @@ def get_text_from_pdf(file_id):
         content = ""
         for page in doc:
             content += page.get_text()
+        
         return content
     except Exception as e:
         return str(e)

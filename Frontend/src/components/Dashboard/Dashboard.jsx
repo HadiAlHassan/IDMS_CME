@@ -11,7 +11,7 @@ function Dashboard() {
 
   useEffect(() => {
     // Update the image URL to trigger a re-fetch
-    setImageUrl(`/wordcloud.svg?timestamp=${new Date().getTime()}`);
+    setImageUrl(`/wordcloud.png?timestamp=${new Date().getTime()}`);
   }, [updateWordCloud]);
 
   return (
