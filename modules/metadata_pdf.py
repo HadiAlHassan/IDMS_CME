@@ -80,6 +80,6 @@ def process_pdf(pdf_path):
     print(summary)
 
 # Example usage
-# pdf_path = 'pdfs/HOW TO BRIEF A CASE_Saunders (1).pdf'
+pdf_path = 'pdfs/supremecourt_landmarkcases (2).pdf'
 
-# process_pdf(pdf_path)
+process_pdf(pdf_path)
