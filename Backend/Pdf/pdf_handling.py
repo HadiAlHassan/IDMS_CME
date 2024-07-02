@@ -33,9 +33,6 @@ def add_pdf(request):
         fs = connect_to_gridfs()
         db = connect_to_mongo()
         
-        existing_file = fs.find_one({'filename': pdf_file.name})
-        if existing_file:
-            return Response({'error': 'File already exists'}, status=400)
         
         file_id = fs.put(pdf_file, filename=pdf_file.name)
         title = pdf_file.name
@@ -45,6 +42,11 @@ def add_pdf(request):
         if metadata_dict['title'] != "No title found":
             title = metadata_dict["title"]
 
+        existing_file = fs.find_one({'filename': title})
+        if existing_file:
+            fs.delete(file_id)
+            return Response({'error': 'File already exists'}, status=400)
+        
         db.fs.files.update_one({'_id': file_id}, {'$set': {'filename': title}})
         with transaction.atomic():
             general_info_data = {

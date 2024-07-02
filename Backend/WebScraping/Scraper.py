@@ -275,7 +275,7 @@ from rest_framework.response import Response
 from django.db import transaction
 
 
-from Utils.db import connect_to_gridfs
+from Utils.db import connect_to_gridfs, connect_to_mongo
 from Utils.helper_functions import get_text_from_txt
 from api.serializers import DocGeneralInfoSerializer, NlpAnalysisSerializer
 from Nlp.wordcloud_generator_testing import test_word_cloud
@@ -387,12 +387,11 @@ class Scraper:
     def __save_to_mongo(self, title, content, url):
         try:
             fs = connect_to_gridfs()
+            db = connect_to_mongo()
             filename = f"{title}.txt"
             filtered_filename = filename.replace(":", "").replace("/", "_").replace("\n"," ").replace("\r"," ")
 
-            existing_website = fs.find_one({'filename': filtered_filename})
-            if existing_website:
-                raise ScrapingException("This content already exists in the database.")
+            
             
             file_id = fs.put(content.encode('utf-8'), filename=filtered_filename)
             content = get_text_from_txt(file_id)
@@ -400,13 +399,21 @@ class Scraper:
                     category = predict_label_from_string(content)
                     ner = extract_entities_from_text(content)
                     metadata_dict = extract_metadata_text(content)
+            title = filtered_filename
+            if metadata_dict['title'] != "No title found":
+                title = metadata_dict["title"]
 
-
+            existing_website = fs.find_one({'filename': title})
+            if existing_website:
+                fs.delete(file_id)
+                raise ScrapingException("This content already exists in the database.")
+            
+            db.fs.files.update_one({'_id': file_id}, {'$set': {'filename': title}})
             with transaction.atomic():
             # Save DocGeneralInfo
                 general_info_data = {
                     'source': url,
-                    'title':  metadata_dict["title"],
+                    'title':  title,
                     'author':metadata_dict["title"]
                 }
             general_info_serializer = DocGeneralInfoSerializer(data=general_info_data)
