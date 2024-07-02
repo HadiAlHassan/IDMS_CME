@@ -12,7 +12,7 @@ def get_reuters_news():
     # Set up Selenium WebDriver with Chrome
     options = Options()
     options.headless = True
-    driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
+    driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()),options=options)
 
     # Navigate to Reuters legal news page
     url = 'https://www.reuters.com/legal/'
@@ -50,14 +50,14 @@ def get_reuters_news():
             else:
                 img_url = ''
 
-            html_string += f"\
-                <li> \
+            html_string += r"<div class=\"${classes.newsItem}\">"+f"\
                 <a href='{full_link}' target='_blank'>{headline}</a>\
-                <br><img src='{img_url}' alt='Image for {headline}' style='max-width:200px;'>\
+                <br><img src='{img_url}' alt='Image for {headline}'>\
                 <br><br>\
-                </li>"
+                </div>"
 
-    html_string += "</ul></html>"
+    html_string += "</div>"
+
 
     return html_string
 
