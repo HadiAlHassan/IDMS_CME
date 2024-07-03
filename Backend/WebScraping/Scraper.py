@@ -391,7 +391,9 @@ class Scraper:
             filename = f"{title}.txt"
             filtered_filename = filename.replace(":", "").replace("/", "_").replace("\n"," ").replace("\r"," ")
 
-            
+            existing_file = fs.find_one({'filename': filtered_filename })
+            if existing_file:
+                return Response({'error': 'File already exists'}, status=400)
             
             file_id = fs.put(content.encode('utf-8'), filename=filtered_filename)
             content = get_text_from_txt(file_id)
@@ -402,11 +404,10 @@ class Scraper:
             title = filtered_filename
             if metadata_dict['title'] != "No title found":
                 title = metadata_dict["title"]
-
-            existing_website = fs.find_one({'filename': title})
-            if existing_website:
-                fs.delete(file_id)
-                raise ScrapingException("This content already exists in the database.")
+                existing_website = fs.find_one({'filename': title})
+                if existing_website:
+                    fs.delete(file_id)
+                    raise ScrapingException("This content already exists in the database.")
             
             db.fs.files.update_one({'_id': file_id}, {'$set': {'filename': title}})
             with transaction.atomic():

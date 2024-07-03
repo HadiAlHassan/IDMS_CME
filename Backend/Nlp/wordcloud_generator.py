@@ -6,6 +6,10 @@ from nltk.corpus import stopwords
 import re
 from collections import Counter
 import matplotlib.pyplot as plt
+import matplotlib 
+matplotlib.use(
+'Agg'
+)
 
 # Download necessary NLTK data
 nltk.download('punkt')

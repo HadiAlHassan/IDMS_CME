@@ -1,9 +1,10 @@
 import PyPDF2
 import pdftitle
 from transformers import pipeline
-
+import logging
 # Function to extract text from a PDF
 def extract_text_from_pdf(file):
+    logging.basicConfig(level=logging.DEBUG)
     text = ""
     reader = PyPDF2.PdfReader(file)
     for page in reader.pages:
