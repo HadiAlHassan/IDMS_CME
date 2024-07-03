@@ -79,7 +79,7 @@
 # print(extracted_entities)
 
 import re
-from datetime import datetime
+import spacy
 from transformers import AutoTokenizer, AutoModelForTokenClassification, pipeline
 
 # Initialize NER model and tokenizer for English
@@ -90,98 +90,60 @@ ner_model = AutoModelForTokenClassification.from_pretrained(ner_model_name)
 # Initialize pipeline
 ner_pipeline = pipeline("ner", model=ner_model, tokenizer=ner_tokenizer, aggregation_strategy="simple")
 
-def format_date(date_str):
-    date_obj = datetime.strptime(date_str, "%Y-%m-%d")
-    formatted_date = date_obj.strftime("%B %d, %Y")
-    # Remove leading zero from the day
-    if formatted_date[5] == '0':
-        formatted_date = formatted_date[:5] + formatted_date[6:]
-    return formatted_date
+nlp = spacy.load("en_core_web_trf")
 
-def extract_dates(text):
-    # Regular expression patterns for various date formats
-    date_patterns = [
-        # MM/DD/YY, DD/MM/YY, YY/MM/DD
-        r'\b(\d{1,2})[-/](\d{1,2})[-/](\d{2,4})\b',
-        r'\b(\d{1,2})\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{2,4})\b',
-        r'\b(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{1,2}),\s+(\d{2,4})\b',
-        r'\b(\d{2,4})[-/](\d{1,2})[-/](\d{1,2})\b',
-        r'\b(\d{4})\b',
-        
-        # Month-Day-Year, Month-Day-Year (no leading zeros)
-        r'\b(\d{1,2})[-](\d{1,2})[-](\d{4})\b',
-        r'\b(\d{1,2})\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{4})\b',
-        r'\b(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{1,2}),\s+(\d{4})\b',
-        
-        # MMDDYY, DDMMYY, YYMMDD
-        r'\b(\d{2})(\d{2})(\d{2})\b',
-        r'\b(\d{2})(\d{2})(\d{2})\b',
-        r'\b(\d{4})(\d{2})(\d{2})\b',
-
-        # MonDDYY, DDMonYY, YYMonDD
-        r'\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)(\d{2})(\d{2})\b',
-        r'\b(\d{2})(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)(\d{2})\b',
-        r'\b(\d{4})(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)(\d{2})\b',
-
-        # Day of year, Year-Day of year
-        r'\b(\d{1,3})/(\d{4})\b',
-        r'\b(\d{4})/(\d{1,3})\b',
-
-        # D Month, Yr, Yr, Month D
-        r'\b(\d{1,2})\s+(January|February|March|April|May|June|July|August|September|October|November|December),\s+(\d{4})\b',
-        r'\b(\d{4}),\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{1,2})\b',
-
-        # Mon-DD-YYYY, DD-Mon-YYYY, YYYY-Mon-DD
-        r'\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)-(\d{2})-(\d{4})\b',
-        r'\b(\d{2})-(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)-(\d{4})\b',
-        r'\b(\d{4})-(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)-(\d{2})\b',
-
-        # Mon DD, YYYY, DD Mon, YYYY, YYYY, Mon DD
-        r'\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{2}),\s+(\d{4})\b',
-        r'\b(\d{2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec),\s+(\d{4})\b',
-        r'\b(\d{4}),\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{2})\b'
+def extract_dates_with_spacy_and_regex(text):
+    # Define refined regex patterns for date formats
+    regex_patterns = [
+        r'\b\d{1,2}/\d{1,2}/\d{2,4}\b',  # e.g., 20/6/2024
+        r'\b\d{1,2}-\d{1,2}-\d{2,4}\b',  # e.g., 20-6-2024
+        r'\b\d{1,2} (?:January|February|March|April|May|June|July|August|September|October|November|December) \d{2,4}\b',  # e.g., 5 February 2024
+        r'\b(?:January|February|March|April|May|June|July|August|September|October|November|December) \d{1,2}, \d{2,4}\b',  # e.g., February 5, 2024
+        r'\b\d{1,2} (?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{2,4}\b',  # e.g., 5 Feb 2024
+        r'\b\d{4}[-/]\d{1,2}[-/]\d{1,2}\b',  # e.g., 2024-06-20
+        r'\b\d{1,2} \w{3,9} \d{4}\b',  # e.g., 5 July 2024
+        r'\b\d{1,2}\s\w{3,9}\s\d{4}\b',  # e.g., 5 July 2024
     ]
-
-    dates = set()
-    for pattern in date_patterns:
-        matches = re.findall(pattern, text, re.IGNORECASE)
+    
+    # Extract dates using regex
+    regex_dates = set()
+    for pattern in regex_patterns:
+        matches = re.findall(pattern, text)
         for match in matches:
-            if len(match) == 3:
-                if pattern in [r'\b(\d{1,2})\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{2,4})\b', r'\b(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{1,2}),\s+(\d{2,4})\b']:
-                    day, month, year = match[1], match[0], match[2]
-                elif pattern in [r'\b(\d{1,2})[-](\d{1,2})[-](\d{4})\b', r'\b(\d{1,2})\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{4})\b', r'\b(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{1,2}),\s+(\d{4})\b']:
-                    day, month, year = match[0], match[1], match[2]
-                else:
-                    day, month, year = match[1], match[0], match[2]
-            else:
-                if pattern in [r'\b(\d{2})(\d{2})(\d{2})\b', r'\b(\d{2})(\d{2})(\d{2})\b', r'\b(\d{4})(\d{2})(\d{2})\b']:
-                    day, month, year = match[1], match[2], match[0]
-                else:
-                    year, month, day = match[0], match[1], match[2] if len(match) == 3 else (None, None, None)
+            regex_dates.add(match)
+    
+    # Extract dates using spaCy
+    doc = nlp(text)
+    spacy_dates = set()
+    for ent in doc.ents:
+        if ent.label_ == 'DATE':
+            spacy_dates.add(ent.text)
+    
+    # Combine results and filter out non-date phrases
+    all_dates = regex_dates.union(spacy_dates)
+    
+    # Additional filtering to exclude phrases that are not actual dates
+    filtered_dates = set()
+    for date in all_dates:
+        if re.match(r'\d{1,2}/\d{1,2}/\d{2,4}', date) or re.match(r'\d{1,2}-\d{1,2}-\d{2,4}', date):
+            filtered_dates.add(date)
+        elif re.match(r'\d{1,2} (?:January|February|March|April|May|June|July|August|September|October|November|December) \d{2,4}', date):
+            filtered_dates.add(date)
+        elif re.match(r'\d{4}[-/]\d{1,2}[-/]\d{1,2}', date):
+            filtered_dates.add(date)
+        elif re.match(r'\d{1,2} (?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{2,4}', date):
+            filtered_dates.add(date)
+        elif re.match(r'\d{1,2} \w{3,9} \d{4}', date):
+            filtered_dates.add(date)
 
-            # Ensure the year is in a reasonable range
-            if year and len(year) == 2:
-                year = "19" + year if int(year) > 50 else "20" + year
-            year = int(year) if year else None
-            if 1900 <= year <= 2100:
-                try:
-                    if day and month:
-                        date_str = f"{year:04d}-{int(month):02d}-{int(day):02d}"
-                    elif year:
-                        # Assign a default month and day for year-only dates
-                        date_str = f"{year:04d}-01-01"
-                    formatted_date = format_date(date_str)
-                    dates.add(formatted_date)
-                except ValueError:
-                    continue
-    return dates
+    return filtered_dates
 
 def extract_entities(text):
     # Split the text into chunks of 150 words
     words = text.split()
     chunks = [' '.join(words[i:i+150]) for i in range(0, len(words), 150)]
 
-    entities = {"Names": set(), "Locations": set(), "Organizations": set(), "Dates": set()}
+    entities = {"Names": set(), "Locations": set(), "Organizations": set()}
 
     for chunk in chunks:
         # Perform NER analysis on each chunk using BERT NER model
@@ -217,25 +179,7 @@ def extract_entities(text):
             elif current_type == 'ORG':
                 entities["Organizations"].add(current_entity.strip())
 
-        # Use custom date extraction to find dates
-        dates = extract_dates(chunk)
-        entities["Dates"].update(dates)
-
     # Combine multi-word entities and separate them correctly
-    def combine_entities(entity_set):
-        combined_entities = set()
-        temp_entity = ""
-        for entity in sorted(entity_set):
-            if temp_entity and (entity.istitle() or not entity[0].islower()): # Check if it starts with uppercase
-                temp_entity += " " + entity
-            else:
-                if temp_entity:
-                    combined_entities.add(temp_entity)
-                temp_entity = entity
-        if temp_entity:
-            combined_entities.add(temp_entity)
-        return combined_entities
-
     def format_entities(entity_set):
         formatted_entities = []
         for entity in sorted(entity_set):
@@ -249,77 +193,127 @@ def extract_entities(text):
     return entities
 
 example_text = """
-Edison High School
-Athletic Contract
-1. To be eligible for any team, the student must meet CIF, SUSD and Edison High School eligibility
-requirements. SUSD and the State of California require a Grade Point Average (GPA) of 2.00 and the
-student athlete must maintain credits towards graduation. Eligibility will be checked each semester.
-2. All athletes must pass a physical examination and have it uploaded into FamilyID. The athlete and
-parents must sign the emergency information and the player packet signature form. This form needs to be
-submitted to FamillyID before the student is allowed to compete.
-3. An athlete may change from one sport to another only if he/she has permission from both coaches. An
-athlete is not allowed to quit a sport from one season to go out for another sport the next season. The
-athlete MUST finish the sport from the previous season.
-4. An athlete MUST be in school a minimum of 2 classes in order to participate in a game or practice held
-on that day. A legal admit must be presented if the athlete misses any part of school on a game or
-practice day in order to be considered for participation.
-5. An athlete MUST attend practices in order to play in the games. It is up to the coach and the individual
-sports program to determine the discipline for missed practices (see program guidelines)
-6. A student athlete will immediately become ineligible and could lose all playing privileges for that season
-of sport for any of the following reasons:
-A. Quitting a sport without a justifiable reason or consent of the coach.
-B. Smoking, drinking, and/or the use of illegal drugs.
-C. Acting in a manner that may bring dishonor or shame to the community or school.
-D. Fighting or coming off the bench or sideline during any fight on the playing area.
-E. Consistent discipline, academic and/or attendance issues.
-F. Participation in a non-school sponsored team, such as city league, shall make the athlete ineligible for
-a school team of that same sport if the participation is during the season.
-**Eligibility may be earned back at the discretion of administration and / or the coach
-7. Student-Athletes are representatives of EHS and at all times must conduct themselves in a manner
-that reflects positively on their teams, school and community
-Failure to comply with any of the requirements stated in this contract will be referred to the
-Coach, the Director of Athletics and/or the Administration for appropriate discipline outlined in
-our code violations.
-Code Violations and Team Disciplinary Action:
-1. Smoking/Distribution/Sale or Use of Tobacco Products - First Violation: Ten (10) day suspension
-from all scrimmages and contests . A suspended player is required to participate in all practices. Second
-Violation: Twenty (20) day suspension from all scrimmages and contests. Third Violation: Will result in
-forfeiture of eligibility to participate in athletics for one (1) year from the point of infraction.
-2. Smoking/Distribution/Sale or Use of Marijuana or Marijuana Products - First Violation: Ten (10) day
-suspension from all scrimmages and contests . A suspended player is required to participate in all
-practices. Second Violation: Twenty (20) day suspension from all scrimmages and contests. Third
-Violation: Will result in forfeiture of eligibility to participate in athletics for one (1) year from the point of
-infraction.
-3. Possession of and/or Consumption of Alcohol and Over the Counter Performance Enhancing
-Products. First Violation: Ten (10) day suspension from all scrimmages and contests. A suspended player
-is required to participate in all practices. Second Violation: Twenty (20) day suspension from all
-scrimmages and contests. Third Violation: Will result in forfeiture of eligibility to participate in athletics for
-one (1) year from the point of infraction.
-4. Fighting- 45 day social probation(suspension interventions document)
-5. Theft or Vandalism: to any school property (Home or Away) while under the supervision of a coach
-or while representing the school team in any way. First Violation: Ten (10) day suspension from all
-scrimmages and contests. A suspended player is required to participate in all practices. Second Violation:
-Twenty (20) day suspension from all scrimmages and contests. Third Violation: Will result in forfeiture of
-eligibility to participate in athletics for one (1) year from the point of infraction.
-6. Conduct Unbecoming or Other Actions or Excessive Misbehavior: that would reflect negatively
-upon the team or school. First Violation: Ten (10) day suspension from all scrimmages and contests. A
-suspended player is required to participate in all practices. Second Violation: Twenty (20) day suspension
-from all scrimmages and contests. Third Violation: Will result in forfeiture of eligibility to participate in
-athletics for one (1) year from the point of infraction.(ex. Running to/instigating/recording or being present
-at a fight)
-7. Cutting Class: If a student is found cutting a class more than once in a day, that student will be
-suspended from all activity that same day. That includes practices, as well as scrimmages, games, meets
-and matches. If the multiple cuts goes undetected until the next school day, then the suspension will take
-effect immediately for that school day
-*NOTE: Suspensions will be carried over to the next season of participation
-I,(print name)___________________________, have read, understand, and agree to follow the Edison
-High school Athletic Contract
-_______________________________________ __________________
-Student Signature Date
-_______________________________________ __________________
-Parent Signature Date
+
+GENERAL GUIDANCE ON PDF BUNDLES
+This guidance is provided in order to achieve a level of useful consistency in the provision of 
+PDF bundles for use by judges in hearings. It is not immutable, and should give way to any 
+specific directions by particular courts or the requirements of particular judges in particular 
+cases. However, it should, if operated properly, provide judges with bundles which are as 
+useful as they can be made. It should be provided to solicitors and litigants in person as a 
+guide to the construction of useful bundles. They ought to be able to comply with all or 
+most of these requirements. If they cannot they should explain why.
+However, please note that these notes are not intended for use in the tribunals.
+Bundling should follow the following principles:
+1. All bundles must, where the character of the document permits, be the subject of OCR
+(optical character recognition). This is the process which turns the document from a mere 
+picture of a document to one in which the text can be read as text so that the document 
+becomes word-searchable and words can be highlighted in the process of marking them up. 
+It is acknowledged that some individual documents may not be susceptible to the process, 
+but most should be.
+2. All documents should appear in portrait mode. If an original document is in landscape, 
+then it should be inserted so that it can be read with a 90 degree rotation clockwise. No 
+document should appear upside down.
+3. The default view for all pages should be 100%.
+4. If a core bundle is required under normal practice, then a PDF core bundle should be 
+produced complying with the same requirements as a paper bundle.
+5. Proper thought should be given to the number of bundles required. It is generally not 
+helpful to have to open a significant number of PDF files during the course of a hearing in 
+order to get at documents. In very many cases it will doubtless be possible to combine all 
+documents in one bundle – statements of case, witness statements and other documents
+(this is the preference of the Family Courts). In larger cases it may be sensible to separate 
+out those categories of documents into separate bundles. However, further subdivision is 
+not helpful – eg it is not helpful to have separate witness statements in separate PDF files. 
+Generally speaking a chronological run of documents should be in one overall file. Again 
+generally speaking, authorities should always be provided in a separate file; this file should 
+be page numbered like all others – see below.
+6. All pages in a bundle must be numbered, and if possible by a computer generated 
+numbering, or at least in typed form (if added by a scanner), and not numbered by hand. If 
+computer generated or typed the number becomes machine readable and can be searched 
+for. Again if possible, the number should be preceded by a letter, whether the letter of the 
+bundle or not. This aids searching. For example, it will be quick to search for and go to page 
+A134 by searching for that. Searching for just “134” may throw up a number of references 
+to that number which are not the page number, which takes the computer time.
+7. Pagination should not mask relevant detail on the original document.
+8. If practicable any scans of documents should not be greater than 300 dpi, in order to 
+avoid slow scrolling or rendering.
+9. All significant documents and all sections in bundles must be bookmarked for ease of 
+navigation, with an appropriate description as the bookmark. The bookmark should contain 
+the page number of the document.
+10. An index or table of contents of the documents should be prepared. If practicable 
+entries should be hyperlinked to the indexed document. Common sense will usually dictate 
+the level of detail in this table of contents.
+11. All PDF files must contain a short version of the name of the case and an indication of 
+the number/letter of the bundle, and end with the hearing date. For example “Carpenters
+v Adventurers Bundle B 1-4-20”; or “Carpenters v Adventures correspondence 1-4-20”. 
+They must not be labelled simply “Correspondence” or “Bundle B”.
+12. If a bundle is to be added to after the file has been transmitted to the judge it should 
+not be assumed the judge will accept it as a complete replacement because he/she may 
+already have started to mark up the original. Inquiries should be made of the judge as to 
+what the judge would like to do about it. Absent a particular direction, a substitute bundle 
+should be made available, but any pages to be added should also be provided separately, in 
+a separate file, as well, with pages appropriately sub-numbered (143.1, 143.2 etc).
+13. In Family Proceedings any bundle must meet the requirements set out in FPR 2010, 
+PD27A.
+Delivering e-bundles
+If an e-bundle is to be delivered by email the sender must be aware that there is a maximum 
+size of attached files which can be received by a justice.gov (DOM1) address. It is 36Mb in 
+aggregate. An email with an attached file which is bigger than that, or an email with files 
+which together total more than that in size, will be rejected. The maximum size of the 
+attachments sent to an ejudiciary.net address is 150Mb in aggregate. The latter limit is 
+seldom likely to cause a problem, though a court-side recipient may not have an Ejudiciary 
+account. The former may. The solution may be to transmit bundles by separate emails. 
+Unless it is absolutely necessary the temptation to break sensibly bundled documents into 
+smaller bundles just for the purpose of transmission should be avoided.
+If bundles are transmitted by email the email subject line should provide the following 
+detail:
+(a) Case number;
+(b) Case name (shortest comprehensible version);
+(c) Hearing date;
+(d) Judge Name (if known);
+(e) The words in capitals “REMOTE HEARING”.
+An alternative is to have documents submitted by a file uploading/downloading system. It is 
+known that some solicitors are using commercial services which provide for that. HMCTS is 
+shortly to launch its own service; details will be provided separately, and it is likely that 
+solicitors will be encouraged to use that service.
+Litigants in person 
+An e-bundle is an organised collection of electronic copies of documents for use at a court 
+hearing that is to take place remotely (by video link or by telephone).
+Ordinarily the applicant is responsible for preparing the e-bundle. If a litigant in person is 
+the applicant the e-bundle must still if at all possible, comply with the above requirements. 
+If it is not possible for a litigant in person to comply with the requirements on e-bundles, a 
+brief explanation of the reasons for this should be provided to the court as far in advance of 
+the hearing as possible. Where possible the litigant in person should identify a practical way 
+of overcoming the problem so that the court can consider this.
+In a case in which a litigant in person is applicant and another party has legal representation 
+the legal representatives for other party should consider offering to prepare the e-bundle. 
+The litigant in person will still be entitled to indicate which documents they consider 
+necessary for inclusion in the e-bundle. 
+Litigants in person who are not eligible for legal aid or cannot access legal aid (publiclyfunded legal assistance) and who do not have the financial means to engage legal assistance 
+may wish to consider approaching an advice centre, law centre or pro bono organisation to 
+see whether legal assistance can be made available without charge. Some but not all advice 
+centres, law centres and pro bono organisations can now be reached on-line or by 
+telephone. 
+Other internet guidance
+Amongst the other internet guidance which is generally available, the following guides 
+might be thought to be particularly useful because of their links with the legal profession:
+(a) A QEB guide to creating an e-bundle - see this YouTube video;
+(b) A video prepared by St Philips Chambers on creating a bundle using Adobe Acrobat 
+Pro: https://st-philips.com/creating-and-using-electronic-hearing-bundles/
+Future versions of this guidance
+This document is intended to be a living document which is to be revised from time to time 
+in the light of experience. It will therefore be useful to check back with it from time to time.
+Sir Andrew McFarlane
+President of the Family Division
+Lady Justice Thirlwall
+Senior Presiding Judge
+Mr Justice Mann
+Judge in charge of Live Services
+
 """
 
 # Extract entities and dates
 extracted_entities = extract_entities(example_text)
 print(extracted_entities)
+extracted_dates = extract_dates_with_spacy_and_regex(example_text)
+
+print("Dates: ",extracted_dates)
