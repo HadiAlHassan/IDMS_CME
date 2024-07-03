@@ -8,7 +8,7 @@ from llama_index.core import VectorStoreIndex
 from llama_index.embeddings.cohere.base import CohereEmbedding
 from llama_index.postprocessor.cohere_rerank import CohereRerank
 from llama_index.core.indices.prompt_helper import PromptHelper
-
+import time
 load_dotenv()
 
 llama_cloud_api_key = os.getenv("LLAMA_CLOUD_API_KEY")
@@ -19,7 +19,7 @@ parser = LlamaParse(
     result_type = "markdown",  
     api_key = llama_cloud_api_key
 )
-
+ 
 # use SimpleDirectoryReader to parse our file
 file_extractor = {".txt": parser}
 documents = SimpleDirectoryReader(input_files=['GRAHAM_v._STATE_OF_WEST_VIRGINIA..txt'], file_extractor = file_extractor).load_data()
@@ -45,25 +45,24 @@ embed_model = CohereEmbedding(
 Settings.llm = Cohere(api_key = cohere_api_key, model="command")
 Settings.embed_model = embed_model
 
-
 prompt_helper = PromptHelper(
     context_window=2048,  # set this to the model's maximum context size
     num_output=512,  # set this to the desired output size
-    chunk_overlap_ratio=0.1,  # set this based on your preference
-    chunk_size_limit=512  # set this based on your preference
-)
+    chunk_overlap_ratio=0.2,  # set this based on your preference
+    chunk_size_limit=500  # set this based on your preference
+ )
 
 Settings.prompt_helper = prompt_helper
 
 # Create a cohere reranker
 cohere_rerank = CohereRerank(api_key= cohere_api_key)
 
-
-
 # Create the query engine
 query_engine = index.as_query_engine(node_postprocessors=[cohere_rerank])
 
 # Generate the response
-response = query_engine.query("explain the case to me",)
-
+start_time = time.time()
+response = query_engine.query("explain the case of commonwealth v graham to me",)
+response_time = time.time() - start_time
 print(response)
+print(response_time)
