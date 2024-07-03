@@ -3,4 +3,3 @@ __pycache__/
 datasets/
 models/
 gen_ai/.env
-test/

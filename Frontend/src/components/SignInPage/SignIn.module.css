@@ -1,0 +1,39 @@
+.signInContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 70vh;
+  background-color: #f0f4f8;
+}
+
+.card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  text-align: center;
+  max-width: 400px;
+  width: 100%;
+}
+
+h2 {
+  margin-bottom: 16px;
+  font-family: "Arial", sans-serif;
+  color: #333;
+}
+
+p {
+  margin-bottom: 24px;
+  color: #666;
+}
+
+.googleButton {
+  background-color: #4285f4;
+  color: white;
+  font-weight: bold;
+  text-transform: none;
+}
+
+.googleButton:hover {
+  background-color: #357ae8;
+}

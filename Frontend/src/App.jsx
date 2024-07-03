@@ -1,29 +1,32 @@
-import Header from "./components/Header/Header";
-import "./index.css";
+import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import HomePage from "./HomePage";
 import PdfViewer from "./components/Pdf/PdfViewer";
-import SignIn from "./SignIn";
+import SignIn from "./components/SignInPage/SignIn";
 import PrivateRoute from "./routes/PrivateRoute";
+import Header from "./components/Header/Header";
+import "./index.css";
+import { AuthProvider } from "./components/Context/AuthContext";
+
 function App() {
   return (
     <BrowserRouter>
       <Header />
-      <div className="App">
-        <Routes>
-          <Route exact path="/" element={<SignIn />} />
-          <Route
-            exact
-            path="/homepage"
-            element={<PrivateRoute element={HomePage} />}
-          />
-          <Route
-            exact
-            path="/view-pdf"
-            element={<PrivateRoute element={PdfViewer} />}
-          />
-        </Routes>
-      </div>
+      <AuthProvider>
+        <div className="App">
+          <Routes>
+            <Route path="/" element={<SignIn />} />
+            <Route
+              path="/homepage"
+              element={<PrivateRoute element={HomePage} />}
+            />
+            <Route
+              path="/view-pdf"
+              element={<PrivateRoute element={PdfViewer} />}
+            />
+          </Routes>
+        </div>
+      </AuthProvider>
     </BrowserRouter>
   );
 }
