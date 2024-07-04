@@ -10,9 +10,9 @@ import { AuthProvider } from "./components/Context/AuthContext";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Header />
-      <AuthProvider>
+    <AuthProvider>
+      <BrowserRouter>
+        <Header />
         <div className="App">
           <Routes>
             <Route path="/" element={<SignIn />} />
@@ -26,8 +26,8 @@ function App() {
             />
           </Routes>
         </div>
-      </AuthProvider>
-    </BrowserRouter>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

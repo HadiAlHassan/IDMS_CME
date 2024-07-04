@@ -1,12 +1,17 @@
 import React from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, Navigate } from "react-router-dom";
 import classes from "./PdfViewer.module.css";
+import { useAuth } from "../Context/AuthContext";
 
 const PdfViewer = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const pdfUrl = queryParams.get("url");
   const metadata = JSON.parse(queryParams.get("metadata"));
+  const { user } = useAuth();
+  if (!user) {
+    return <Navigate to="/" />;
+  }
 
   const formatKey = (key) => {
     return key

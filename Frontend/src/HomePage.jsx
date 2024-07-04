@@ -1,6 +1,5 @@
 import React from "react";
 import AddPdf from "./components/Pdf/AddPdf";
-
 import WebScrapingModal from "./components/Webscraping/WsModal";
 import Dashboard from "./components/Dashboard/Dashboard";
 import FloatingActionButton from "./components/ChatBot/ChatIcon";

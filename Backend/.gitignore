@@ -3,3 +3,6 @@ __pycache__/
 datasets/
 models/
 gen_ai/.env
+/.env
+/idms-a1c57-firebase-adminsdk-8052a-1e2ca3a7da.json
+/users/firebase_config.py

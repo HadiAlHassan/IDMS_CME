@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import axios from "axios";
+import { useAuth } from "../Context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const fetchMetadata = async () => {
   try {
@@ -44,6 +46,8 @@ const columns = [
 
 const BasicExampleDataGrid = () => {
   const [data, setData] = useState([]);
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const getData = async () => {
@@ -55,6 +59,10 @@ const BasicExampleDataGrid = () => {
   }, []);
 
   const handleRowDoubleClick = async (params) => {
+    if (!user) {
+      navigate("/");
+      return;
+    }
     const selectedPdfTitle = params.row.title;
 
     try {

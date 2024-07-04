@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import DocGeneralInfo, NlpAnalysis
+from .models import DocGeneralInfo, NlpAnalysis, User
 
 #Serializers allow complex data such as querysets and model instances to be converted to 
 #native Python datatypes that can then be easily rendered into JSON, XML or other content types.
@@ -17,3 +17,13 @@ class NlpAnalysisSerializer(serializers.ModelSerializer):
              'language', 'ner', 'confidentiality_level',
             'location', 'references', 'in_text_citations', 'word_count'
         ]
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['email', 'password', 'first_name', 'last_name']
+        extra_kwargs = {
+            'password': {'write_only': True},
+            'first_name': {'required': False},
+            'last_name': {'required': False},
+        }
