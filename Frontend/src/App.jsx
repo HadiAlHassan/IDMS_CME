@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import HomePage from "./HomePage";
 import PdfViewer from "./components/Pdf/PdfViewer";
 import SignIn from "./components/SignInPage/SignIn";
+import SignUp from "./components/SignUpPage/Signup"; // Corrected casing
 import PrivateRoute from "./routes/PrivateRoute";
 import Header from "./components/Header/Header";
 import "./index.css";
@@ -16,6 +17,7 @@ function App() {
         <div className="App">
           <Routes>
             <Route path="/" element={<SignIn />} />
+            <Route path="/signup" element={<SignUp />} />
             <Route
               path="/homepage"
               element={<PrivateRoute element={HomePage} />}

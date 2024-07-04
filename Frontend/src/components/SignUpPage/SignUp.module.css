@@ -1,4 +1,4 @@
-.signInContainer {
+.signUpContainer {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -27,30 +27,18 @@ p {
   color: #666;
 }
 
-.googleButton {
+.signUpButton {
   background-color: #4285f4;
   color: white;
   font-weight: bold;
   text-transform: none;
-  margin-bottom: 16px;
 }
 
-.googleButton:hover {
+.signUpButton:hover {
   background-color: #357ae8;
 }
 
-.signUpContainer {
-  margin-top: 16px;
-  text-align: center;
-}
-
-.signUpButton {
-  margin-top: 8px;
-  text-transform: none;
-  font-weight: bold;
-}
-.separator {
-  margin: 24px 0;
-  border: none;
-  border-top: 1px solid #ccc;
+.error {
+  color: red;
+  margin-top: 10px;
 }
