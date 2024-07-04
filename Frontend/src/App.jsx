@@ -5,7 +5,6 @@ import PdfViewer from "./components/Pdf/PdfViewer";
 import SignIn from "./components/SignInPage/SignIn";
 import SignUp from "./components/SignUpPage/Signup"; // Corrected casing
 import PrivateRoute from "./routes/PrivateRoute";
-import Header from "./components/Header/Header";
 import "./index.css";
 import { AuthProvider } from "./components/Context/AuthContext";
 
@@ -13,7 +12,6 @@ function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <Header />
         <div className="App">
           <Routes>
             <Route path="/" element={<SignIn />} />

@@ -7,11 +7,13 @@ import BasicModal from "./components/Pdf/Modal";
 import { UpdateProvider } from "./components/Context/UpdateContext";
 import { Container } from "@mui/material";
 import "./index.css";
+import Header from "./components/Header/Header";
 
 function HomePage() {
   return (
     <UpdateProvider>
       <div className="Homepage">
+        <Header />
         <Container>
           <div className="flexContainer">
             <div className="addPdfContainer">
