@@ -46,10 +46,15 @@ embed_model = CohereEmbedding(
     embedding_type = "int8",
 )
 
+hierarchical_node_parser = HierarchicalNodeParser.from_defaults(
+    chunk_sizes=[2048, 1024, 512]
+)
+
 index = VectorStoreIndex.from_documents(
     documents = documents,
     embed_model = embed_model,
-    transformations = [SentenceSplitter(chunk_size=1024, chunk_overlap=20)],
+    transformations = [hierarchical_node_parser,
+                       SentenceSplitter(chunk_size=1024, chunk_overlap=20)],
 )
 
 #Chunk size
@@ -65,7 +70,7 @@ query_engine = index.as_query_engine(node_postprocessors=[cohere_rerank])
 
 # Generate the response
 start_time = time.time()
-response = query_engine.query("what were all the names the defendant went by from the case of graham v west virginia",)
+response = query_engine.query("summarize all details and the judgement from the case of graham v west virginia",)
 response_time = time.time() - start_time
 
 print(response)
