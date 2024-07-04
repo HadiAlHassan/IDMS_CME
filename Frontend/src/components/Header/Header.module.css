@@ -2,16 +2,21 @@
   font-size: 2em;
   font-weight: 700;
   color: #f2f2f2;
+  flex-grow: 1;
+  text-align: center;
 }
 
 .Header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   background-color: #1769aa;
   padding: 3px;
-  text-align: center;
   box-shadow: 0 4px 8px 0 rgba(56, 56, 56, 0.2);
   transition: 0.3s;
   border-radius: 10px;
 }
+
 .Header:hover {
   box-shadow: 0 5px 10px 0 rgba(56, 56, 56, 0.2);
 }
