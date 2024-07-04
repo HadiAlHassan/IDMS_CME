@@ -1,24 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../components/Context/AuthContext";
 
 const PrivateRoute = ({ element: Element, ...rest }) => {
-  const { currentUser, loading } = useAuth();
+  const { currentUser } = useAuth();
+  console.log(
+    "private route",
+    currentUser || localStorage.getItem("token") != null
+  );
 
-  console.log("PrivateRoute user:", currentUser);
-  console.log("PrivateRoute loading:", loading);
-
-  if (loading) {
-    return <div>Loading...</div>; // Optional: Add a loading spinner or component here
+  if (currentUser || localStorage.getItem("token") != null) {
+    return <Element {...rest} />;
   }
-
-  if (!currentUser) {
-    console.log("Not authenticated, redirecting to sign-in page.");
-    return <Navigate to="/" />;
-  }
-
-  console.log("Authenticated, rendering the requested page.");
-  return <Element {...rest} />;
+  return <Navigate to="/" />;
 };
 
 export default PrivateRoute;

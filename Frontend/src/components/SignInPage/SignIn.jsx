@@ -1,26 +1,29 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@mui/material";
-import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import { auth } from "../Firebase/Firebase";
+import { Button, TextField } from "@mui/material";
+import axios from "axios";
 import classes from "./SignIn.module.css";
 
 export default function SignIn() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const signInWithGoogle = () => {
-    const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({
-      prompt: "select_account",
-    });
-    signInWithPopup(auth, provider)
-      .then((result) => {
-        console.log(result);
-        navigate("/homepage");
-      })
-      .catch((error) => {
-        console.error("Error signing in with Google: ", error);
+  const signIn = async () => {
+    try {
+      const response = await axios.post("http://localhost:8000/api/login", {
+        email,
+        password,
       });
+      const userData = response.data.user;
+      localStorage.setItem("token", userData["idToken"]);
+
+      console.log("Successfully logged in:", userData);
+      navigate("/homepage"); // Navigate to homepage on successful login
+    } catch (err) {
+      setError(err.response?.data?.message || "An error occurred");
+    }
   };
 
   return (
@@ -28,12 +31,29 @@ export default function SignIn() {
       <div className={classes.card}>
         <h2>Welcome to IDMS</h2>
         <p>Sign in to continue</p>
+        <TextField
+          label="Email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          fullWidth
+          margin="normal"
+        />
+        <TextField
+          label="Password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          fullWidth
+          margin="normal"
+        />
+        {error && <p className={classes.error}>{error}</p>}
         <Button
           variant="contained"
           className={classes.googleButton}
-          onClick={signInWithGoogle}
+          onClick={signIn}
         >
-          Sign In with Google
+          Sign In
         </Button>
       </div>
     </div>

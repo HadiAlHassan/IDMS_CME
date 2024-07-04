@@ -46,8 +46,6 @@ const columns = [
 
 const BasicExampleDataGrid = () => {
   const [data, setData] = useState([]);
-  const { user } = useAuth();
-  const navigate = useNavigate();
 
   useEffect(() => {
     const getData = async () => {
@@ -59,10 +57,6 @@ const BasicExampleDataGrid = () => {
   }, []);
 
   const handleRowDoubleClick = async (params) => {
-    if (!user) {
-      navigate("/");
-      return;
-    }
     const selectedPdfTitle = params.row.title;
 
     try {
@@ -86,9 +80,10 @@ const BasicExampleDataGrid = () => {
       }
 
       // Ensure metadata is an object containing general_info and nlp_analysis keys
-      const viewerUrl = `/view-pdf?url=${encodeURIComponent(
+      const viewerUrl = `http://localhost:5173/view-pdf?url=${encodeURIComponent(
         pdfUrl
       )}&metadata=${encodeURIComponent(JSON.stringify(metadata))}`;
+      console.log(viewerUrl, "ViewURL");
       window.open(viewerUrl, "_blank");
     } catch (error) {
       console.error("Error opening PDF:", error);
