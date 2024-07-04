@@ -1,18 +1,16 @@
 .viewerContainer {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   height: 100vh;
   background-color: #f2f2f2;
-  overflow: hidden;
 }
 
 .metadataContainer {
-  width: 100%;
+  width: 40%;
   padding: 20px;
   overflow-y: auto;
-  background-color: #f2f2f2;
+  background-color: #f2f2f2 !important;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  flex-shrink: 0;
 }
 
 .metadataTable {
@@ -36,49 +34,32 @@
   background-color: #e9e9e9;
 }
 
-.metadataValue table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.metadataValue td {
-  border: none;
-}
-
-.metadataSectionTitle {
-  background-color: #1769aa;
-  color: white;
-  text-align: center;
-  padding: 10px;
-  font-size: 16px;
-  font-weight: bold;
-}
-
 .pdfViewerContainer {
   flex-grow: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #f2f2f2;
+  background-color: #ffffff;
 }
 
 .pdfDocument {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   width: 100%;
-  height: 90vh;
-  overflow: auto;
+  height: 100%;
+  border: none;
 }
 
-@media (min-width: 768px) {
-  .viewerContainer {
-    flex-direction: row;
-  }
+.nestedTable {
+  width: 100%;
+  border-collapse: collapse;
+}
 
-  .metadataContainer {
-    width: 40%;
-  }
+.nestedTable th,
+.nestedTable td {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
 
-  .pdfViewerContainer {
-    width: 60%;
-  }
+.nestedTable tr:nth-child(even) {
+  background-color: #f2f2f2;
 }

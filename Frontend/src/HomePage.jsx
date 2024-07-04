@@ -8,12 +8,14 @@ import { UpdateProvider } from "./components/Context/UpdateContext";
 import { Container } from "@mui/material";
 import "./index.css";
 import Header from "./components/Header/Header";
+import SideBarDrawer from "./components/SideBar/SideBarDrawer";
 
 function HomePage() {
   return (
     <UpdateProvider>
       <div className="Homepage">
         <Header />
+        <SideBarDrawer />
         <Container>
           <div className="flexContainer">
             <div className="addPdfContainer">

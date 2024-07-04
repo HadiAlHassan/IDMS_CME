@@ -19,4 +19,5 @@ urlpatterns = [ #redirects to api/views.py
     path('category-document-count', pdf_handling.category_document_count, name='category_document_count'),
     path('signup', user_functions.signup, name='signup'),
     path('login', user_functions.login, name='login'),
+    path('get-news', WS_handling.get_news, name="get_news")
 ]
