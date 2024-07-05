@@ -103,6 +103,7 @@ def extract_dates_with_spacy_and_regex(text):
         r'\b\d{4}[-/]\d{1,2}[-/]\d{1,2}\b',  # e.g., 2024-06-20
         r'\b\d{1,2} \w{3,9} \d{4}\b',  # e.g., 5 July 2024
         r'\b\d{1,2}\s\w{3,9}\s\d{4}\b',  # e.g., 5 July 2024
+        r'\b(?:January|February|March|April|May|June|July|August|September|October|November|December) \d{1,2}, \d{4}\b'  # e.g., April 30, 1994
     ]
     
     # Extract dates using regex
@@ -134,6 +135,8 @@ def extract_dates_with_spacy_and_regex(text):
         elif re.match(r'\d{1,2} (?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{2,4}', date):
             filtered_dates.add(date)
         elif re.match(r'\d{1,2} \w{3,9} \d{4}', date):
+            filtered_dates.add(date)
+        elif re.match(r'(?:January|February|March|April|May|June|July|August|September|October|November|December) \d{1,2}, \d{4}', date):
             filtered_dates.add(date)
 
     return filtered_dates
@@ -193,7 +196,6 @@ def extract_entities(text):
     return entities
 
 example_text = """
-
 GENERAL GUIDANCE ON PDF BUNDLES
 This guidance is provided in order to achieve a level of useful consistency in the provision of 
 PDF bundles for use by judges in hearings. It is not immutable, and should give way to any 
