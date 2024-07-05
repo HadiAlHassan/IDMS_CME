@@ -280,8 +280,33 @@ from Utils.helper_functions import get_text_from_txt
 from api.serializers import DocGeneralInfoSerializer, NlpAnalysisSerializer
 from Nlp.wordcloud_generator_testing import test_word_cloud
 from Nlp.categorization import predict_label_from_string
-from Nlp.name_entity_recognition import extract_entities_from_text
+from Nlp.name_entity_recognition import extract_information
 from Nlp.nlp_analysis import extract_metadata_text
+from Nlp.metadata_url import Scraper as Scrape_luido
+
+import chromadb
+import tempfile
+from llama_index.vector_stores.chroma import ChromaVectorStore
+from llama_index.core import StorageContext
+import os
+from dotenv import load_dotenv
+from llama_parse import LlamaParse
+from llama_index.llms.cohere import Cohere
+from llama_index.core import SimpleDirectoryReader
+from llama_index.core import Settings
+from llama_index.core import VectorStoreIndex
+from llama_index.core import SummaryIndex
+from llama_index.embeddings.cohere.base import CohereEmbedding
+from llama_index.postprocessor.cohere_rerank import CohereRerank
+from llama_index.core.indices.prompt_helper import PromptHelper
+from llama_index.core.node_parser import HierarchicalNodeParser
+from llama_index.core.node_parser import SentenceSplitter
+from llama_index.core import StorageContext, load_index_from_storage
+
+load_dotenv()
+
+
+
 
 class DomainSource(Enum):
     HarvardLawReview = 1
@@ -391,31 +416,38 @@ class Scraper:
             filename = f"{title}.txt"
             filtered_filename = filename.replace(":", "").replace("/", "_").replace("\n"," ").replace("\r"," ")
 
+            scrape_luido = Scrape_luido()
+            metadata_dict1 = scrape_luido.scrape(url)
+            print(metadata_dict1["title"])
             existing_file = fs.find_one({'filename': filtered_filename })
             if existing_file:
                 return Response({'error': 'File already exists'}, status=400)
             
             file_id = fs.put(content.encode('utf-8'), filename=filtered_filename)
             content = get_text_from_txt(file_id)
+            ner = {}
             if content!="":
                     category = predict_label_from_string(content)
-                    ner = extract_entities_from_text(content)
+                    ner = extract_information(content)
                     metadata_dict = extract_metadata_text(content)
             title = filtered_filename
-            if metadata_dict['title'] != "No title found":
-                title = metadata_dict["title"]
+            if metadata_dict1['title'] != "No title found":
+                title = metadata_dict1["title"]
+                print("ana hon !!!!!")
                 existing_website = fs.find_one({'filename': title})
+                print("ana honikkk!!!!!")
                 if existing_website:
                     fs.delete(file_id)
                     raise ScrapingException("This content already exists in the database.")
             
             db.fs.files.update_one({'_id': file_id}, {'$set': {'filename': title}})
+            print("hele rommane!!!!!")
             with transaction.atomic():
             # Save DocGeneralInfo
                 general_info_data = {
                     'source': url,
                     'title':  title,
-                    'author':metadata_dict["title"]
+                    'author':metadata_dict1["author"]
                 }
             general_info_serializer = DocGeneralInfoSerializer(data=general_info_data)
             if general_info_serializer.is_valid():
@@ -425,13 +457,13 @@ class Scraper:
             
             
             category = "Other"
-            ner = {}
+            
             
             # Save NlpAnalysis
             nlp_analysis_data = {
                 'nlp_id': general_info.nlp_id,
                 'document_type': 'PDF',
-                'summary': metadata_dict["summary"],  # Add your summarization logic here
+                'summary': metadata_dict1["summary"],  # Add your summarization logic here
                 'category': category,  # Example category, change as needed
                 'language': metadata_dict["language"],  # Example language, change as needed
                 'ner': ner,  
@@ -474,6 +506,73 @@ class Scraper:
 
             if title and content:
                 self.__save_to_mongo(title, content, url)
+
+                # llama_cloud_api_key = "llx-R8ls8nAvxmelKcuHKjjMPChplUue9WxRI7y41iq5eVgSP9tD"
+                # cohere_api_key = "5KI2hpHsWl3Zz8LloXDBkeHSoPdduH1j50SvCneU"
+
+                # parsing_prompt = "You are a legal document parses for an intelligent document management system.\
+                # Extract all relevant details from the document, in anticipation of a search query related to any detail."
+                # parser = LlamaParse(result_type = "markdown",  
+                # api_key = llama_cloud_api_key,
+                # parsing_instruction = parsing_prompt)
+
+
+
+
+                # filename = f"{title}.txt"
+                # filtered_filename = filename.replace(":", "").replace("/", "_").replace("\n"," ").replace("\r"," ")
+                # with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+                #     temp_file_path = temp_file.name
+                #     # Write to the temporary file
+                #     temp_file.write(content.encode('utf-8'))
+
+                # # Define new file name
+                # new_file_name = filtered_filename
+                # new_file_path = os.path.join(os.path.dirname(temp_file_path), new_file_name)
+
+                # # Rename the file
+                # os.rename(temp_file_path, new_file_path)
+                # # load some documents
+                # file_extractor = {".txt": parser}
+
+                # #assume we loaded it from the mongodb
+                # documents = SimpleDirectoryReader(input_files=[new_file_path],
+                #                                   file_extractor = file_extractor).load_data()
+                
+                # os.remove(new_file_path)
+
+                
+                # # initialize client, setting path to save data
+                # db = chromadb.PersistentClient(path="chroma_db")
+                # # create collection
+                # chroma_collection = db.get_or_create_collection("documents")
+
+                # # assign chroma as the vector_store to the context
+                # vector_store = ChromaVectorStore(chroma_collection=chroma_collection)
+                # storage_context = StorageContext.from_defaults(vector_store=vector_store)
+
+                # #Setting the embedding and feeding to the index
+                # embed_model = CohereEmbedding(
+                #     api_key = cohere_api_key,
+                #     model_name = "embed-english-v3.0",
+                #     input_type = "search_document",
+                #     embedding_type = "int8",
+                # )
+
+                # hierarchical_node_parser = HierarchicalNodeParser.from_defaults(
+                #     chunk_sizes=[2048, 1024, 512]
+                # )
+
+                # # load your index from stored vectors
+                # index = VectorStoreIndex.from_vector_store(
+                #     vector_store, storage_context=storage_context,
+                #     embed_model=embed_model, 
+                #     transformations=[hierarchical_node_parser, SentenceSplitter(chunk_size=1024, chunk_overlap=20)]
+                # )
+
+                # index.insert(documents[0])
+
+
 
     def __extract_text_from_pdf(self, url):
         try:

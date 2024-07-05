@@ -2,7 +2,7 @@ from django.urls import path
 from api import views  
 from Pdf import pdf_handling
 from WebScraping import WS_handling
-from gen_ai import chat_bot
+from gen_ai import chat_bot, rag
 from users import user_functions
 
 urlpatterns = [ #redirects to api/views.py
@@ -19,5 +19,6 @@ urlpatterns = [ #redirects to api/views.py
     path('category-document-count', pdf_handling.category_document_count, name='category_document_count'),
     path('signup', user_functions.signup, name='signup'),
     path('login', user_functions.login, name='login'),
-    path('get-news', WS_handling.get_news, name="get_news")
+    path('get-news', WS_handling.get_news, name="get_news"),
+    path('rag', rag.rag, name='rag')
 ]
