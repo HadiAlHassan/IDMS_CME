@@ -1,5 +1,5 @@
 import React from "react";
-import { useLocation, Navigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import classes from "./PdfViewer.module.css";
 
 const PdfViewer = () => {

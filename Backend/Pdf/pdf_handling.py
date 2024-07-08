@@ -16,7 +16,7 @@ from api.serializers import DocGeneralInfoSerializer, NlpAnalysisSerializer
 from Utils.decorators import timing_decorator
 from Nlp.wordcloud_generator_testing import test_word_cloud
 from Nlp.categorization import predict_label_from_string
-from Nlp.name_entity_recognition import extract_entities_from_text
+from Nlp.name_entity_recognition import extract_information
 from Nlp.nlp_analysis import extract_metadata_pdf
 from api.models import CategoryDocumentCount
 from Nlp.nlp_analysis_optimized import extract_metadata, summarize_pdf
@@ -71,7 +71,7 @@ def add_pdf(request):
             ner = {}
             if content != "":
                 category = predict_label_from_string(content)
-                ner = extract_entities_from_text(content)
+                ner = extract_information(content)
             
             nlp_analysis_data = {
                 'nlp_id': general_info.nlp_id,

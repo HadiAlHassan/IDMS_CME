@@ -280,7 +280,7 @@ from Utils.helper_functions import get_text_from_txt
 from api.serializers import DocGeneralInfoSerializer, NlpAnalysisSerializer
 from Nlp.wordcloud_generator_testing import test_word_cloud
 from Nlp.categorization import predict_label_from_string
-from Nlp.name_entity_recognition import extract_entities_from_text
+from Nlp.name_entity_recognition import extract_information
 from Nlp.nlp_analysis import extract_metadata_text
 
 class DomainSource(Enum):
@@ -394,12 +394,12 @@ class Scraper:
             existing_file = fs.find_one({'filename': filtered_filename })
             if existing_file:
                 return Response({'error': 'File already exists'}, status=400)
-            
+            ner = {}
             file_id = fs.put(content.encode('utf-8'), filename=filtered_filename)
             content = get_text_from_txt(file_id)
             if content!="":
                     category = predict_label_from_string(content)
-                    ner = extract_entities_from_text(content)
+                    ner = extract_information(content)
                     metadata_dict = extract_metadata_text(content)
             title = filtered_filename
             if metadata_dict['title'] != "No title found":
@@ -415,7 +415,7 @@ class Scraper:
                 general_info_data = {
                     'source': url,
                     'title':  title,
-                    'author':metadata_dict["title"]
+                    'author':metadata_dict["author"]
                 }
             general_info_serializer = DocGeneralInfoSerializer(data=general_info_data)
             if general_info_serializer.is_valid():
@@ -425,7 +425,7 @@ class Scraper:
             
             
             category = "Other"
-            ner = {}
+            
             
             # Save NlpAnalysis
             nlp_analysis_data = {
