@@ -26,6 +26,12 @@ export default function SignIn() {
     }
   };
 
+  const handleKeyPress = (event) => {
+    if (event.key === "Enter") {
+      signIn();
+    }
+  };
+
   const navigateToSignUp = () => {
     navigate("/signup");
   };
@@ -42,6 +48,7 @@ export default function SignIn() {
           onChange={(e) => setEmail(e.target.value)}
           fullWidth
           margin="normal"
+          onKeyDown={handleKeyPress}
         />
         <TextField
           label="Password"
@@ -50,6 +57,7 @@ export default function SignIn() {
           onChange={(e) => setPassword(e.target.value)}
           fullWidth
           margin="normal"
+          onKeyDown={handleKeyPress}
         />
         {error && <p className={classes.error}>{error}</p>}
         <Button

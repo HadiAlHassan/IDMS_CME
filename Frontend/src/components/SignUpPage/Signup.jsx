@@ -12,6 +12,12 @@ export default function SignUp() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  const handleKeyPress = (event) => {
+    if (event.key === "Enter") {
+      signUp();
+    }
+  };
+
   const signUp = async () => {
     try {
       const response = await axios.post("http://localhost:8000/api/signup", {
@@ -42,6 +48,7 @@ export default function SignUp() {
           onChange={(e) => setFirstName(e.target.value)}
           fullWidth
           margin="normal"
+          onKeyDown={handleKeyPress}
         />
         <TextField
           label="Last Name"
@@ -49,6 +56,7 @@ export default function SignUp() {
           onChange={(e) => setLastName(e.target.value)}
           fullWidth
           margin="normal"
+          onKeyDown={handleKeyPress}
         />
         <TextField
           label="Email"
@@ -57,6 +65,7 @@ export default function SignUp() {
           onChange={(e) => setEmail(e.target.value)}
           fullWidth
           margin="normal"
+          onKeyDown={handleKeyPress}
         />
         <TextField
           label="Password"
@@ -65,6 +74,7 @@ export default function SignUp() {
           onChange={(e) => setPassword(e.target.value)}
           fullWidth
           margin="normal"
+          onKeyDown={handleKeyPress}
         />
         {error && <p className={classes.error}>{error}</p>}
         <Button
