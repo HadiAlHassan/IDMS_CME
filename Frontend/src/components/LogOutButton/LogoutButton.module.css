@@ -1,10 +1,12 @@
 .logoutButton {
-  background-color: #3494e3 !important;
+  background-color: #e33434 !important;
   color: white !important;
   font-weight: bold !important;
-  left: 1rem;
+  left: 1rem !important;
+  position: absolute !important;
+  bottom: 1rem !important;
 }
 
 .logoutButton:hover {
-  background-color: #1769aa !important;
+  background-color: #910d0d !important;
 }
