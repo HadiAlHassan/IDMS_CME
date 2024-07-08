@@ -24,6 +24,7 @@ def extract_dates_with_spacy_and_regex(text):
         r'\b\d{1,2} \w{3,9} \d{4}\b',  # e.g., 5 July 2024
         r'\b\d{1,2}\s\w{3,9}\s\d{4}\b',  # e.g., 5 July 2024
         r'\b(?:January|February|March|April|May|June|July|August|September|October|November|December) \d{1,2}, \d{4}\b'  # e.g., April 30, 1994
+        r'\b(?:January|February|March|April|May|June|July|August|September|October|November|December) \d{4}\b'  # e.g., December 2024
     ]
    
     # Extract dates using regex
@@ -31,14 +32,14 @@ def extract_dates_with_spacy_and_regex(text):
     for pattern in regex_patterns:
         matches = re.findall(pattern, text)
         for match in matches:
-            regex_dates.add(match)
+            regex_dates.add(match.lower())
    
     # Extract dates using spaCy
     doc = nlp(text)
     spacy_dates = set()
     for ent in doc.ents:
         if ent.label_ == 'DATE':
-            spacy_dates.add(ent.text)
+            spacy_dates.add(ent.text.lower())
    
     # Combine results and filter out non-date phrases
     all_dates = regex_dates.union(spacy_dates)
@@ -48,18 +49,20 @@ def extract_dates_with_spacy_and_regex(text):
     for date in all_dates:
         if re.match(r'\d{1,2}/\d{1,2}/\d{2,4}', date) or re.match(r'\d{1,2}-\d{1,2}-\d{2,4}', date):
             filtered_dates.add(date)
-        elif re.match(r'\d{1,2} (?:January|February|March|April|May|June|July|August|September|October|November|December) \d{2,4}', date):
+        elif re.match(r'\d{1,2} (?:january|february|march|april|may|june|july|august|september|october|november|december) \d{2,4}', date):
             filtered_dates.add(date)
         elif re.match(r'\d{4}[-/]\d{1,2}[-/]\d{1,2}', date):
             filtered_dates.add(date)
-        elif re.match(r'\d{1,2} (?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{2,4}', date):
+        elif re.match(r'\d{1,2} (?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec) \d{2,4}', date):
             filtered_dates.add(date)
         elif re.match(r'\d{1,2} \w{3,9} \d{4}', date):
             filtered_dates.add(date)
-        elif re.match(r'(?:January|February|March|April|May|June|July|August|September|October|November|December) \d{1,2}, \d{4}', date):
+        elif re.match(r'(?:january|february|march|april|may|june|july|august|september|october|november|december) \d{1,2}, \d{4}', date):
+            filtered_dates.add(date)
+        elif re.match(r'(?:january|february|march|april|may|june|july|august|september|october|november|december) \d{4}', date):
             filtered_dates.add(date)
  
-    return filtered_dates
+    return list(filtered_dates)
  
 def extract_entities(text):
     # Split the text into chunks of 150 words
@@ -85,29 +88,29 @@ def extract_entities(text):
             else:
                 if current_entity and current_type:
                     if current_type == 'PER':
-                        entities["Names"].add(current_entity.strip())
+                        entities["Names"].add(current_entity.strip().lower())
                     elif current_type == 'LOC':
-                        entities["Locations"].add(current_entity.strip())
+                        entities["Locations"].add(current_entity.strip().lower())
                     elif current_type == 'ORG':
-                        entities["Organizations"].add(current_entity.strip())
+                        entities["Organizations"].add(current_entity.strip().lower())
                 current_entity = entity_text
                 current_type = entity_type
  
         # Add the last entity
         if current_entity and current_type:
             if current_type == 'PER':
-                entities["Names"].add(current_entity.strip())
+                entities["Names"].add(current_entity.strip().lower())
             elif current_type == 'LOC':
-                entities["Locations"].add(current_entity.strip())
+                entities["Locations"].add(current_entity.strip().lower())
             elif current_type == 'ORG':
-                entities["Organizations"].add(current_entity.strip())
+                entities["Organizations"].add(current_entity.strip().lower())
  
     # Combine multi-word entities and separate them correctly
     def format_entities(entity_set):
         formatted_entities = []
         for entity in sorted(entity_set):
             if len(entity) > 1:  # Filter out single-letter entities
-                formatted_entities.append(entity)
+                formatted_entities.append(entity.title())  # Capitalize each entity
         return formatted_entities
  
     entities["Names"] = format_entities(entities["Names"])
@@ -124,5 +127,5 @@ def extract_information(text):
         "Names": entities["Names"],
         "Organizations": entities["Organizations"],
         "Locations": entities["Locations"],
-        "Dates": list(dates)
+        "Dates": dates
     }

@@ -422,7 +422,7 @@ class Scraper:
             existing_file = fs.find_one({'filename': filtered_filename })
             if existing_file:
                 return Response({'error': 'File already exists'}, status=400)
-            
+            ner = {}
             file_id = fs.put(content.encode('utf-8'), filename=filtered_filename)
             content = get_text_from_txt(file_id)
             ner = {}
@@ -447,7 +447,7 @@ class Scraper:
                 general_info_data = {
                     'source': url,
                     'title':  title,
-                    'author':metadata_dict1["author"]
+                    'author':metadata_dict["title"]
                 }
             general_info_serializer = DocGeneralInfoSerializer(data=general_info_data)
             if general_info_serializer.is_valid():
