@@ -151,9 +151,9 @@ def extract_metadata(pdf_file, max_length=1024, summary_max_length=130, summary_
     summary = summarize_large_text(text, max_length, summary_max_length, summary_min_length)
 
     metadata = {
-        "Title": title if title else "N/A",
-        "Author": info.author if info.author else "N/A",
-        "Summary": summary
+        "title": title if title else "No title found",
+        "author": info.author if info.author else "No author found",
+        "summary": summary
     }
     
     return metadata
@@ -163,10 +163,10 @@ def process_pdf(pdf_file):
     # Extract metadata, including the summary
     result = extract_metadata(pdf_file)
     
-    print("Title:", result["Title"])
-    print("Author:", result["Author"])
+    print("Title:", result["title"])
+    print("Author:", result["author"])
     print("\nSummary:")
-    print(result["Summary"])
+    print(result["summary"])
 
 # Example usage
 pdf_path = 'pdfs/uksc-2022-0064-press-summary (1).pdf'
