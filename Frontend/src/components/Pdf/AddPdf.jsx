@@ -5,12 +5,13 @@ import SuccessAlerts from "../Alert/Success";
 import { useState, useContext } from "react";
 import ErrorAlerts from "../Alert/Error";
 import { UpdateContext } from "../Context/UpdateContext";
-
+import Loading from "../Loading/Loading";
 function AddPdf() {
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const { handleFileUploadSuccess } = useContext(UpdateContext);
+  const [loading, setLoading] = useState(false);
 
   function clickHandler() {
     const fileInput = document.createElement("input");
@@ -24,6 +25,7 @@ function AddPdf() {
     const file = event.target.files[0];
     const formData = new FormData();
     formData.append("file", file);
+    setLoading(true);
 
     try {
       const response = await fetch("http://localhost:8000/api/add-pdf", {
@@ -44,12 +46,15 @@ function AddPdf() {
       }
     } catch (error) {
       console.error("Error uploading file:", error);
+    } finally {
+      setLoading(false); // Set loading to false when the upload is complete
     }
     console.log("Selected file:", file);
   }
 
   return (
     <div className={classes.container}>
+      {loading && <Loading text={"Analyzing your PDF"} />}
       <Button
         className={classes.button}
         variant="contained"

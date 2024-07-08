@@ -67,6 +67,7 @@ function SideBarDrawer() {
         variant="outlined"
         color="inherit"
         onClick={toggleDrawer(true)}
+        sx={{ paddingLeft: 0, paddingRight: 0 }}
       >
         <img
           src="/icons/newspaper.png"

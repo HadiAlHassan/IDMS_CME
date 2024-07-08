@@ -12,42 +12,47 @@ import SuccessAlerts from "../Alert/Success";
 import ErrorAlerts from "../Alert/Error";
 import { useContext, useState } from "react";
 import { UpdateContext } from "../Context/UpdateContext";
+import Loading from "../Loading/Loading";
+import { faIR } from "@mui/material/locale";
 
 export default function WebScrapingModal() {
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const { handleFileUploadSuccess } = useContext(UpdateContext);
-
   const [open, setOpen] = React.useState(false);
+  const [loading, setLoading] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
     setOpen(false);
   };
 
-  function handleScrape() {
+  async function handleScrape() {
     console.log(
       "Scraping website:",
       document.getElementById("urlToScrape").value
     );
-    axios
-      .post("http://localhost:8000/api/scrape-website", {
-        url: document.getElementById("urlToScrape").value,
-      })
-
-      .then((response) => {
-        console.log("Scraped website:", response.data);
-        setShowSuccessAlert(true);
-        setTimeout(() => setShowSuccessAlert(false), 5000);
-        handleFileUploadSuccess(); // Call this to update the word cloud
-      })
-      .catch((error) => {
-        console.error("Error scraping website:", error);
-        setShowErrorAlert(true);
-        setErrorMessage(error.response?.data?.error);
-        setTimeout(() => setShowErrorAlert(false), 5000);
-      });
+    setLoading(true);
     handleClose();
+    try {
+      const response = await axios.post(
+        "http://localhost:8000/api/scrape-website",
+        {
+          url: document.getElementById("urlToScrape").value,
+        }
+      );
+      console.log("Scraped website:", response.data);
+      setShowSuccessAlert(true);
+      setTimeout(() => setShowSuccessAlert(false), 5000);
+      handleFileUploadSuccess(); // Call this to update the word cloud
+    } catch (error) {
+      console.error("Error scraping website:", error);
+      setShowErrorAlert(true);
+      setErrorMessage(error.response?.data?.error);
+      setTimeout(() => setShowErrorAlert(false), 5000);
+    } finally {
+      setLoading(false); // Set loading to false after the scraping process is complete
+    }
   }
 
   return (
@@ -60,6 +65,7 @@ export default function WebScrapingModal() {
       >
         Scrape a website
       </Button>
+      {loading && <Loading text={"Analyzing your URL"} />}
       <Modal
         aria-labelledby="unstyled-modal-title"
         aria-describedby="unstyled-modal-description"

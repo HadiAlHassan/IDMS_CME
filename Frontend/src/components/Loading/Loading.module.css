@@ -1,0 +1,18 @@
+/* Loading.module.css */
+.loadingContainer {
+  position: fixed;
+  top: 1.5rem;
+  right: 7rem;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.loadingSpinner {
+  margin-right: 10px;
+}
