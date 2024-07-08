@@ -8,7 +8,16 @@ def get_news(url="https://www.law360.com/employment"):
     
     soup = BeautifulSoup(response.text, 'lxml')
 
-    html_string = "<div>"
+    news_items = []
+    
+    specific_news = {
+        "title": "NYT v. OpenAI: The Times’s About-Face",
+        "link": "https://harvardlawreview.org/blog/2024/04/nyt-v-openai-the-timess-about-face/",
+        "description": "This article discusses the New York Times' legal battle with OpenAI, focusing on the implications for AI and copyright law."
+    }
+    news_items.append(specific_news)
+
+    
 
     # Find the news container
     news_container = soup.find('div', id='news-headlines')
@@ -27,17 +36,11 @@ def get_news(url="https://www.law360.com/employment"):
                 description_tag = headline.find('p', class_='entry-content')
                 description = description_tag.get_text(strip=True) if description_tag else ''
                 
-                html_string += r"<div class=\"${classes.newsItem}\">"+f"\
-                    <a href='{full_link}' target='_blank'>{title}</a>\
-                    <br><p>{description}</p>\
-                    <br><br>\
-                    </div>"
+                news_items.append({
+                    "title": title,
+                    "link": full_link,
+                    "description": description
+                })
 
-    html_string += "</div>"
+    return news_items
 
-    return html_string
-
-
-if __name__ == "__main__":
-    html_output = get_news()
-    print(html_output)

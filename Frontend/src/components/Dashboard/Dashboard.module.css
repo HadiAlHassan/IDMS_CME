@@ -2,7 +2,7 @@
   display: grid;
   grid-template-columns: 1fr; /* Single column layout by default */
   gap: 20px; /* Space between the items */
-  padding: 20px; /* Padding around the entire container */
+  /* Padding around the entire container */
 }
 
 @media (min-width: 768px) {

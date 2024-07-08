@@ -14,16 +14,16 @@
 
 .flexContainer {
   display: flex;
-  margin-top: 1.3rem;
+  margin-top: 0.5rem;
 }
 
 .addPdfContainer {
-  margin-right: 1.3rem;
+  margin-right: 0.5rem;
 }
 .viewPdfContainer {
-  margin-right: 1.3rem;
+  margin-right: 0.5rem;
 }
 
 .dashboard {
-  margin-top: 1.3rem;
+  margin-top: 0.5rem;
 }

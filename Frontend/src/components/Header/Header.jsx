@@ -5,9 +5,9 @@ import SideBarDrawer from "../SideBar/SideBarDrawer";
 function Header() {
   return (
     <div className={classes.Header}>
-      <SideBarDrawer />
-      <p className={classes.TitleWebsite}>Intelligent Data Management System</p>
       <LogoutButton />
+      <p className={classes.TitleWebsite}>Intelligent Data Management System</p>
+      <SideBarDrawer />
     </div>
   );
 }

@@ -1,39 +1,44 @@
-/* SidebarDrawer.module.css */
 .sideBar {
-  width: 250px;
+  width: 300px;
+  padding: 20px;
 }
 
 .sideBarHeader {
   font-size: 1.5em;
-  margin: 20px;
+  margin: 20px 0;
   text-align: center;
 }
 
-.newsItem {
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #e0e0e0;
+.newsCard {
+  margin-bottom: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
 }
 
-.newsItem a {
+.newsLink {
   font-weight: bold;
-  color: #000000;
+  color: #3494e3;
   text-decoration: none;
 }
 
-.newsItem a:hover {
+.newsLink:hover {
   text-decoration: underline;
 }
 
 .sideBarButton {
   margin-left: 0;
   background-color: #3494e3 !important;
-  color: white !important;
-  left: 1rem;
+  color: transparent !important;
+  right: 1rem;
   box-shadow: inset;
   box-shadow: 4px 4px 4px 0px rgba(31, 31, 31, 0.2);
 }
 
 .sideBarButton:hover {
   background-color: #1769aa !important;
+}
+
+.iconImage {
+  width: 2.25rem; /* Adjust size as needed */
+  height: 2.25rem; /* Adjust size as needed */
 }
