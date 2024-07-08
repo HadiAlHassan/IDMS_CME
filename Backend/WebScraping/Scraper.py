@@ -447,7 +447,7 @@ class Scraper:
                 general_info_data = {
                     'source': url,
                     'title':  title,
-                    'author':metadata_dict["title"]
+                    'author':metadata_dict1["author"]
                 }
             general_info_serializer = DocGeneralInfoSerializer(data=general_info_data)
             if general_info_serializer.is_valid():
@@ -455,9 +455,7 @@ class Scraper:
             else:
                 raise ScrapingException("Error in saving document general info to MongoDB")
             
-            
             category = "Other"
-            
             
             # Save NlpAnalysis
             nlp_analysis_data = {
