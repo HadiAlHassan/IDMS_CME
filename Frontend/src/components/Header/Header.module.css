@@ -25,9 +25,9 @@
   box-shadow: 0 5px 10px 0 rgba(56, 56, 56, 0.2);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1000px) {
   .TitleWebsite {
-    font-size: 1em;
+    font-size: 2rem;
   }
 
   .Header {

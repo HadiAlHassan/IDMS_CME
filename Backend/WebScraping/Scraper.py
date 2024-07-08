@@ -460,7 +460,7 @@ class Scraper:
             # Save NlpAnalysis
             nlp_analysis_data = {
                 'nlp_id': general_info.nlp_id,
-                'document_type': 'PDF',
+                'document_type': 'URL',
                 'summary': metadata_dict1["summary"],  # Add your summarization logic here
                 'category': category,  # Example category, change as needed
                 'language': metadata_dict["language"],  # Example language, change as needed

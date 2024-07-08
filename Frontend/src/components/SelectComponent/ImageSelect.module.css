@@ -1,0 +1,26 @@
+/* ImageSelect.module.css */
+.selectBox {
+  margin: 1rem;
+  padding: 0.5rem;
+  background-color: #3494e3;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  float: right;
+}
+
+.menuButton {
+  color: white !important;
+  font-weight: bold;
+  background-color: #3494e3;
+  border-radius: 0.25rem;
+  padding: 0.75rem;
+}
+
+.menuButton:hover {
+  background-color: #1769aa !important;
+}
+
+.MuiMenu-paper {
+  background-color: #3494e3 !important;
+  color: white !important;
+}
