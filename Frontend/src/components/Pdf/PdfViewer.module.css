@@ -1,3 +1,7 @@
+.pagecontainer {
+  margin-top: 1rem;
+}
+
 .viewerContainer {
   display: flex;
   flex-direction: row;

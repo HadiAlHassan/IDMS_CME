@@ -1,6 +1,7 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
 import classes from "./PdfViewer.module.css";
+import Header from "../Header/Header";
 
 const PdfViewer = () => {
   const location = useLocation();
@@ -50,36 +51,41 @@ const PdfViewer = () => {
   };
 
   return (
-    <div className={classes.viewerContainer}>
-      <div className={classes.metadataContainer}>
-        <h3>Metadata</h3>
-        <table className={classes.metadataTable}>
-          <tbody>
-            <tr>
-              <th colSpan="2" className={classes.metadataSectionTitle}>
-                General Info
-              </th>
-            </tr>
-            {formatMetadata(metadata.general_info)}
-            <tr>
-              <th colSpan="2" className={classes.metadataSectionTitle}>
-                NLP Analysis
-              </th>
-            </tr>
-            {formatMetadata(metadata.nlp_analysis)}
-          </tbody>
-        </table>
+    <>
+      <Header />
+      <div className={classes.pagecontainer}>
+        <div className={classes.viewerContainer}>
+          <div className={classes.metadataContainer}>
+            <h3>Metadata</h3>
+            <table className={classes.metadataTable}>
+              <tbody>
+                <tr>
+                  <th colSpan="2" className={classes.metadataSectionTitle}>
+                    General Info
+                  </th>
+                </tr>
+                {formatMetadata(metadata.general_info)}
+                <tr>
+                  <th colSpan="2" className={classes.metadataSectionTitle}>
+                    NLP Analysis
+                  </th>
+                </tr>
+                {formatMetadata(metadata.nlp_analysis)}
+              </tbody>
+            </table>
+          </div>
+          <div className={classes.pdfViewerContainer}>
+            <iframe
+              src={pdfUrl}
+              className={classes.pdfDocument}
+              height="100%"
+              width="100%"
+              title="PDF Viewer"
+            ></iframe>
+          </div>
+        </div>
       </div>
-      <div className={classes.pdfViewerContainer}>
-        <iframe
-          src={pdfUrl}
-          className={classes.pdfDocument}
-          height="100%"
-          width="100%"
-          title="PDF Viewer"
-        ></iframe>
-      </div>
-    </div>
+    </>
   );
 };
 

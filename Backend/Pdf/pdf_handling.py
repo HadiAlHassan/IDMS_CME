@@ -39,6 +39,7 @@ from llama_index.core.indices.prompt_helper import PromptHelper
 from llama_index.core.node_parser import HierarchicalNodeParser
 from llama_index.core.node_parser import SentenceSplitter
 from llama_index.core import StorageContext, load_index_from_storage
+from WebScraping.initializations import parser, index
 
 
 
@@ -72,48 +73,6 @@ def add_pdf(request):
                 fs.delete(file_id)
                 return Response({'error': 'File already exists'}, status=400)
         
-        #######################################################################################
-        # llama_cloud_api_key = "llx-R8ls8nAvxmelKcuHKjjMPChplUue9WxRI7y41iq5eVgSP9tD"
-        # cohere_api_key = "5KI2hpHsWl3Zz8LloXDBkeHSoPdduH1j50SvCneU"
-
-        # parsing_prompt = "You are a legal document parses for an intelligent document management system.\
-        # Extract all relevant details from the document, in anticipation of a search query related to any detail."
-        # parser = LlamaParse(result_type = "markdown",  
-        # api_key = llama_cloud_api_key,
-        # parsing_instruction = parsing_prompt)
-
-        # documents = parser.load_data(str(pdf_file))
-        
-        # # initialize client, setting path to save data
-        # db = chromadb.PersistentClient(path="chroma_db")
-        # # create collection
-        # chroma_collection = db.get_or_create_collection("documents")
-
-        # # assign chroma as the vector_store to the context
-        # vector_store = ChromaVectorStore(chroma_collection=chroma_collection)
-        # storage_context = StorageContext.from_defaults(vector_store=vector_store)
-
-        # #Setting the embedding and feeding to the index
-        # embed_model = CohereEmbedding(
-        #     api_key = cohere_api_key,
-        #     model_name = "embed-english-v3.0",
-        #     input_type = "search_document",
-        #     embedding_type = "int8",
-        # )
-
-        # hierarchical_node_parser = HierarchicalNodeParser.from_defaults(
-        #     chunk_sizes=[2048, 1024, 512]
-        # )
-
-        # # load your index from stored vectors
-        # index = VectorStoreIndex.from_vector_store(
-        #     vector_store, storage_context=storage_context,
-        #     embed_model=embed_model, 
-        #     transformations=[hierarchical_node_parser, SentenceSplitter(chunk_size=1024, chunk_overlap=20)]
-        # )
-
-        # index.insert(documents[0])  
-        ###########################################################################################      
         db.fs.files.update_one({'_id': file_id}, {'$set': {'filename': title}})
         with transaction.atomic():
             general_info_data = {
@@ -129,6 +88,24 @@ def add_pdf(request):
                 return Response({'error': 'Failed to add DocGeneralInfo', 'details': general_info_serializer.errors}, status=400)
             
             content = get_text_from_pdf(file_id)
+
+            filename = f"{title}.txt"
+            filtered_filename = filename.replace(":", "").replace("/", "_").replace("\n"," ").replace("\r"," ")
+
+            with open(filtered_filename,"w",encoding="utf-8") as temp_file:
+                temp_file.write(content)
+
+            file_extractor = {".txt": parser}
+
+            documents = SimpleDirectoryReader(input_files=[filtered_filename],
+                                                file_extractor = file_extractor).load_data()
+            print("document sent to llamaparse")
+            directory = os.getcwd()
+            os.remove(f"{directory}/{filtered_filename}")
+            print("Document temp file deleted")
+            index.insert(documents[0])
+            print("document inserted to index!")
+
             category = "Other"
             ner = {}
             if content != "":
@@ -151,7 +128,7 @@ def add_pdf(request):
             nlp_analysis_serializer = NlpAnalysisSerializer(data=nlp_analysis_data)
             if nlp_analysis_serializer.is_valid():
                 nlp_analysis_serializer.save()
-                test_word_cloud(content)
+                #test_word_cloud(content)
             else:
                 
                 return Response({'error': 'Failed to add NlpAnalysis', 'details': nlp_analysis_serializer.errors}, status=400)

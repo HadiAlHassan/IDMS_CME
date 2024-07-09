@@ -35,6 +35,12 @@ function Dashboard() {
           <PieChartComponent />
         </CardContent>
       </Card>
+      <Card className={classes.column}>
+        <CardContent></CardContent>
+      </Card>
+      <Card className={classes.column}>
+        <CardContent></CardContent>
+      </Card>
     </div>
   );
 }

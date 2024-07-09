@@ -302,7 +302,7 @@ from llama_index.core.indices.prompt_helper import PromptHelper
 from llama_index.core.node_parser import HierarchicalNodeParser
 from llama_index.core.node_parser import SentenceSplitter
 from llama_index.core import StorageContext, load_index_from_storage
-
+from WebScraping.initializations import parser, index
 load_dotenv()
 
 
@@ -504,71 +504,26 @@ class Scraper:
 
             if title and content:
                 self.__save_to_mongo(title, content, url)
+                filename = f"{title}.txt"
+                filtered_filename = filename.replace(":", "").replace("/", "_").replace("\n"," ").replace("\r"," ")
 
-                # llama_cloud_api_key = "llx-R8ls8nAvxmelKcuHKjjMPChplUue9WxRI7y41iq5eVgSP9tD"
-                # cohere_api_key = "5KI2hpHsWl3Zz8LloXDBkeHSoPdduH1j50SvCneU"
+                with open(filtered_filename,"w",encoding="utf-8") as temp_file:
+                    temp_file.write(content)
 
-                # parsing_prompt = "You are a legal document parses for an intelligent document management system.\
-                # Extract all relevant details from the document, in anticipation of a search query related to any detail."
-                # parser = LlamaParse(result_type = "markdown",  
-                # api_key = llama_cloud_api_key,
-                # parsing_instruction = parsing_prompt)
-
-
-
-
-                # filename = f"{title}.txt"
-                # filtered_filename = filename.replace(":", "").replace("/", "_").replace("\n"," ").replace("\r"," ")
-                # with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-                #     temp_file_path = temp_file.name
-                #     # Write to the temporary file
-                #     temp_file.write(content.encode('utf-8'))
-
-                # # Define new file name
-                # new_file_name = filtered_filename
-                # new_file_path = os.path.join(os.path.dirname(temp_file_path), new_file_name)
-
-                # # Rename the file
-                # os.rename(temp_file_path, new_file_path)
-                # # load some documents
-                # file_extractor = {".txt": parser}
+                print(os.getcwd())
+                print(os.path.exists(filtered_filename))
+                file_extractor = {".txt": parser}
 
                 # #assume we loaded it from the mongodb
-                # documents = SimpleDirectoryReader(input_files=[new_file_path],
-                #                                   file_extractor = file_extractor).load_data()
-                
-                # os.remove(new_file_path)
+                documents = SimpleDirectoryReader(input_files=[filtered_filename],
+                                                   file_extractor = file_extractor).load_data()
+                # print("document Parsed!")
+                directory = os.getcwd()
+                os.remove(f"{directory}/{filtered_filename}")
+                # print("Document temp file deleted")
+                index.insert(documents[0])
+                # print("document pasred")
 
-                
-                # # initialize client, setting path to save data
-                # db = chromadb.PersistentClient(path="chroma_db")
-                # # create collection
-                # chroma_collection = db.get_or_create_collection("documents")
-
-                # # assign chroma as the vector_store to the context
-                # vector_store = ChromaVectorStore(chroma_collection=chroma_collection)
-                # storage_context = StorageContext.from_defaults(vector_store=vector_store)
-
-                # #Setting the embedding and feeding to the index
-                # embed_model = CohereEmbedding(
-                #     api_key = cohere_api_key,
-                #     model_name = "embed-english-v3.0",
-                #     input_type = "search_document",
-                #     embedding_type = "int8",
-                # )
-
-                # hierarchical_node_parser = HierarchicalNodeParser.from_defaults(
-                #     chunk_sizes=[2048, 1024, 512]
-                # )
-
-                # # load your index from stored vectors
-                # index = VectorStoreIndex.from_vector_store(
-                #     vector_store, storage_context=storage_context,
-                #     embed_model=embed_model, 
-                #     transformations=[hierarchical_node_parser, SentenceSplitter(chunk_size=1024, chunk_overlap=20)]
-                # )
-
-                # index.insert(documents[0])
 
 
 

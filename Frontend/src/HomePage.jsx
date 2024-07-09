@@ -15,7 +15,6 @@ function HomePage() {
     <UpdateProvider>
       <div className="Homepage">
         <Header />
-
         <Container>
           <div className="flexContainer">
             <div className="addPdfContainer">

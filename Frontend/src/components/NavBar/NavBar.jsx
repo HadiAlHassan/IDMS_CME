@@ -9,45 +9,46 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
-import classes from "./NavBar.module.css";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import FolderIcon from "@mui/icons-material/Folder";
+import PeopleIcon from "@mui/icons-material/People";
+import EventIcon from "@mui/icons-material/Event";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutButton from "../LogOutButton/LogoutButton";
+import classes from "./NavBar.module.css";
+import { useNavigate } from "react-router-dom";
 
 export default function NavBar() {
   const [open, setOpen] = React.useState(false);
+  const navigate = useNavigate();
 
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
   };
 
+  const handleNavigation = (path) => {
+    navigate(path);
+    setOpen(false);
+  };
   const DrawerList = (
     <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)}>
       <List>
-        {["Inbox", "Starred", "Send email", "Drafts"].map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
+        {[
+          { text: "Profile", icon: <AccountCircleIcon />, path: "/profile" },
+          { text: "Dashboard", icon: <DashboardIcon />, path: "/homepage" },
+          { text: "Cases", icon: <FolderIcon />, path: "/cases" },
+          { text: "Clients", icon: <PeopleIcon />, path: "/clients" },
+          { text: "Calendar", icon: <EventIcon />, path: "/calendar" },
+        ].map((item) => (
+          <ListItem key={item.text} disablePadding>
+            <ListItemButton onClick={() => handleNavigation(item.path)}>
+              <ListItemIcon>{item.icon}</ListItemIcon>
+              <ListItemText primary={item.text} />
             </ListItemButton>
           </ListItem>
         ))}
       </List>
       <Divider />
-      <List>
-        {["All mail", "Trash", "Spam"].map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
       <LogoutButton />
     </Box>
   );

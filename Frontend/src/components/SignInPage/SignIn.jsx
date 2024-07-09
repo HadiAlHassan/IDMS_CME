@@ -18,7 +18,7 @@ export default function SignIn() {
       });
       const userData = response.data.user;
       localStorage.setItem("token", userData["idToken"]);
-
+      localStorage.setItem("email", userData["email"]);
       console.log("Successfully logged in:", userData);
       navigate("/homepage"); // Navigate to homepage on successful login
     } catch (err) {

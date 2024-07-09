@@ -7,7 +7,8 @@ import SignUp from "./components/SignUpPage/Signup"; // Corrected casing
 import PrivateRoute from "./routes/PrivateRoute";
 import "./index.css";
 import { AuthProvider } from "./components/Context/AuthContext";
-
+import Profile from "./components/Profile/ProfilePage";
+import CasesPage from "./components/Cases/CasesPage";
 function App() {
   return (
     <AuthProvider>
@@ -23,6 +24,14 @@ function App() {
             <Route
               path="/view-pdf"
               element={<PrivateRoute element={PdfViewer} />}
+            />
+            <Route
+              path="/profile"
+              element={<PrivateRoute element={Profile} />}
+            />
+            <Route
+              path="/cases"
+              element={<PrivateRoute element={CasesPage} />}
             />
           </Routes>
         </div>
