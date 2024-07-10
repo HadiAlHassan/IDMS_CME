@@ -47,5 +47,11 @@
 }
 
 .pendingStatus {
-  color: yellow;
+  color: darkgoldenrod;
+}
+
+.noCasesMessage {
+  text-align: center;
+  margin-top: 20px;
+  color: gray;
 }

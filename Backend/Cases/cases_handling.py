@@ -52,37 +52,146 @@ def create_case(request):
    
  
 from api.models import DocGeneralInfo
+
 @timing_decorator
 @api_view(['PUT'])
-def update_case_status(request):
+def update_case(request):
     try:
-        # Extract case data from request
+        # Extract data from request
         name = request.data.get('name')
-        new_status = request.data.get('status')
         user_id = request.data.get('user_id')
         
-        # Validate required fields
-        if not all([name, new_status, user_id]):
-            return Response({'error': 'Name and status are required'}, status=400)
+        # Ensure the essential fields are provided
+        if not all([name, user_id]):
+            return Response({'error': 'Name and user_id are required'}, status=400)
+        
+        # Fields to update
+        new_name = request.data.get('new_name')
+        client = request.data.get('client')
+        status = request.data.get('status')
+        time = request.data.get('time')
+        trial_date = request.data.get('trial_date')
+        document_titles = request.data.get('document_titles', [])
+        # Connect to MongoDB
+        db = connect_to_mongo()
+
+        # Find the case by name and user_id
+        existing_case = db.cases.find_one({'name': name, 'user_id': user_id})
+        if not existing_case:
+            return Response({'error': 'Case not found'}, status=404)
+
+        # Update fields
+        update_fields = {}
+        if new_name:
+            update_fields['name'] = new_name
+        if client:
+            update_fields['client'] = client
+        if status:
+            update_fields['status'] = status
+        if time:
+            update_fields['time'] = time
+        if trial_date:
+            update_fields['trial_date'] = trial_date
+        if document_titles:
+            update_fields['documents_related'] = document_titles
+        if update_fields:
+            db.cases.update_one({'name': name, 'user_id': user_id}, {'$set': update_fields})
+
+        return Response({'message': 'Case updated successfully'}, status=200)
+
+    except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")
+        return Response({'error': 'An unexpected error occurred'}, status=500)
+
+@timing_decorator
+@api_view(['POST'])
+def get_cases_by_user(request):
+    try:
+        # Extract the user_id from the request body
+        user_id = request.data.get('user_id')
+ 
+        # Validate required field
+        if not user_id:
+            return Response({'error': 'user_id is required'}, status=400)
  
         # Connect to MongoDB
         db = connect_to_mongo()
  
-        # Find the case by name
-        existing_case = db.cases.find_one({'name': name, 'user_id': user_id})
-        if not existing_case:   
-            return Response({'error': 'Case not found'}, status=404)
+        # Check if the user exists by querying the user collection
+        user_exists = db.user.find_one({'firebase_uid': user_id})
+        if not user_exists:
+            return Response({'error': 'User does not exist'}, status=404)
  
-        # Update the case status
-        db.cases.update_one({'name': name}, {'$set': {'status': new_status}})
+        # Retrieve all cases for the given user_id
+        cases = db.cases.find({'user_id': user_id})
  
-        return Response({'message': 'Case status updated successfully'}, status=200)
+        # Convert cases to a list of dictionaries
+        case_list = []
+        for case in cases:
+            case_list.append({
+                'name': case.get('name'),
+                'client': case.get('client'),
+                'status': case.get('status'),
+                'time': case.get('time'),
+                'documents_related': case.get('documents_related'),
+                'trial_date': case.get('trial_date'),
+                'user_id': case.get('user_id')
+            })
+ 
+        return Response({'cases': case_list}, status=200)
  
     except Exception as e:
         logger.error(f"Unexpected error: {str(e)}")
         return Response({'error': 'An unexpected error occurred'}, status=500)
-   
- 
+    
+@timing_decorator
+@api_view(['POST'])
+def get_case_details(request):
+    try:
+        # Extract case data from request body
+        case_name = request.data.get('name', '').strip()
+        user_id = request.data.get('user_id', '').strip()
+
+        # Log the received values
+        logger.info(f"Received request for case: '{case_name}' and user: '{user_id}'")
+
+        # Validate required fields
+        if not all([case_name, user_id]):
+            logger.error('Missing required fields in request')
+            return Response({'error': 'name and user_id are required'}, status=400)
+
+        # Connect to MongoDB
+        db = connect_to_mongo()
+
+        # Check if the user exists
+        user_exists = db.user.find_one({'firebase_uid': user_id})
+        if not user_exists:
+            logger.error(f'User with ID {user_id} does not exist')
+            return Response({'error': 'User does not exist'}, status=404)
+
+        # Check if the case exists for the given user_id
+        case = db.cases.find_one({'name': case_name, 'user_id': user_id}, {'_id': 0})
+        if not case:
+            logger.error(f'Case {case_name} not found for user {user_id}')
+            return Response({'error': 'Case not found for this user'}, status=404)
+
+        # Return case information
+        return Response({
+            'name': case.get('name'),
+            'client': case.get('client'),
+            'status': case.get('status'),
+            'time': case.get('time'),
+            'documents_related': case.get('documents_related'),
+            'trial_date': case.get('trial_date'),
+            'user_id': case.get('user_id')
+        }, status=200)
+
+    except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")
+        return Response({'error': 'An unexpected error occurred'}, status=500)
+
+
+    
 @timing_decorator
 @api_view(['PUT'])
 def add_documents_to_case(request):

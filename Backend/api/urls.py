@@ -23,7 +23,9 @@ urlpatterns = [ #redirects to api/views.py
     path('get-news', WS_handling.get_news, name="get_news"),
     path('rag', rag.rag, name='rag'),
     path('create-case', cases_handling.create_case, name='create_case'),
-    path('update-case-status', cases_handling.update_case_status, name='update_case_status'),
+    path('update-case', cases_handling.update_case, name='update_case'),
     path('add-documents-to-case', cases_handling.add_documents_to_case, name='add_documents_to_case'),
-    path('get-all-titles', cases_handling.get_all_titles, name='get_all_titles')
+    path('get-all-titles', cases_handling.get_all_titles, name='get_all_titles'),
+    path('get-cases-by-user', cases_handling.get_cases_by_user, name='get_cases_by_user'),
+    path('get-case-details', cases_handling.get_case_details, name='get_case_details')
 ]

@@ -1,38 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Card, CardContent, Typography, Button } from "@mui/material";
+import axios from "axios";
 import EditIcon from "@mui/icons-material/Edit";
 import classes from "./CaseDetailPage.module.css";
 import Header from "../Header/Header";
 import EditCaseModal from "../Cases/EditCaseModal";
 
-const mockData = [
-  {
-    id: 1,
-    caseName: "Case 1",
-    clientName: "Client 1",
-    caseStatus: "Open",
-    openedDate: "2024-07-01T12:00:00Z",
-    trialDates: ["2024-08-01", "2024-09-01"],
-    documents: ["Doc1", "Doc2"],
-  },
-  {
-    id: 2,
-    caseName: "Case 2",
-    clientName: "Client 2",
-    caseStatus: "Closed",
-    openedDate: "2024-06-01T12:00:00Z",
-    trialDates: ["2024-07-01", "2024-08-01"],
-    documents: ["Doc1", "Doc2"],
-  },
-  // Add more mock data as needed
-];
-
 const CaseDetailPage = () => {
-  const { id } = useParams();
-  const caseItem = mockData.find((caseItem) => caseItem.id === parseInt(id));
+  const { name } = useParams();
+  const [caseItem, setCaseItem] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [updatedCase, setUpdatedCase] = useState(caseItem);
+
+  const [updatedCase, setUpdatedCase] = useState(null);
+
+  useEffect(() => {
+    const fetchCase = async () => {
+      try {
+        const userId = localStorage.getItem("firebase_id");
+        const response = await axios.post(
+          "http://localhost:8000/api/get-case-details",
+          {
+            name: name,
+            user_id: userId,
+          }
+        );
+
+        const caseData = response.data;
+        setCaseItem(caseData);
+        setUpdatedCase(caseData);
+      } catch (error) {
+        console.error("Error fetching case:", error);
+      }
+    };
+
+    fetchCase();
+  }, [name]);
 
   if (!caseItem) {
     return <div>Case not found</div>;
@@ -64,28 +67,28 @@ const CaseDetailPage = () => {
         <Card className={classes.caseDetailCard}>
           <CardContent>
             <Typography variant="h5" className={classes.caseTitle}>
-              {updatedCase.caseName}
+              {updatedCase.name}
             </Typography>
             <Typography className={classes.caseDetail}>
-              Client: {updatedCase.clientName}
+              Client: {updatedCase.client}
             </Typography>
             <Typography
               className={`${classes.caseDetail} ${getStatusClass(
-                updatedCase.caseStatus
+                updatedCase.status
               )}`}
             >
-              Status: {updatedCase.caseStatus}
+              Status: {updatedCase.status}
             </Typography>
             <Typography className={classes.caseDetail}>
-              Opened: {new Date(updatedCase.openedDate).toLocaleString()}
+              Opened: {new Date(updatedCase.time).toLocaleString()}
             </Typography>
             <Typography className={classes.caseDetail}>
-              Important Dates: {updatedCase.trialDates.join(", ")}
+              Important Dates: {updatedCase.trial_date}
             </Typography>
             <Typography className={classes.caseDetail}>
               Related Documents:
               <ul>
-                {updatedCase.documents.map((doc, index) => (
+                {updatedCase.documents_related.map((doc, index) => (
                   <li key={index}>{doc}</li>
                 ))}
               </ul>

@@ -35,7 +35,7 @@ function App() {
               element={<PrivateRoute element={CasesPage} />}
             />
             <Route
-              path="/cases/:id"
+              path="/cases/:name"
               element={<PrivateRoute element={CaseDetailPage} />}
             />
           </Routes>
