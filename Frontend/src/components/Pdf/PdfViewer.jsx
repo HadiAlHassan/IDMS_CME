@@ -8,14 +8,33 @@ const PdfViewer = () => {
   const queryParams = new URLSearchParams(location.search);
   const pdfUrl = queryParams.get("url");
   const metadata = JSON.parse(queryParams.get("metadata"));
+  const excludedFields = ["_id", "general_info_id", "nlp_id", "document_type"];
 
   const formatKey = (key) => {
+    if (key === "ner") {
+      return "Named Entity Recognition";
+    }
     return key
       .replace(/_/g, " ") // Replace underscores with spaces
       .replace(/\b\w/g, (char) => char.toUpperCase()); // Capitalize first letter of each word
   };
 
-  const formatValue = (value) => {
+  const formatSpecialValue = (key, value) => {
+    if (key === "ner" || key === "references" || key === "in_text_citations") {
+      // Remove "OrderedDict" and strip brackets
+      const cleanedValue = JSON.stringify(value)
+        .replace(/OrderedDict/g, "")
+        .replace(/[\{\}\[\]]/g, "")
+        .replace(/['"]+/g, "")
+        .replace(/: ,/g, ": NONE,")
+        .replace(/: $/g, ": NONE");
+
+      return cleanedValue;
+    }
+    return value.toString();
+  };
+
+  const formatValue = (key, value) => {
     if (typeof value === "object" && !Array.isArray(value)) {
       return (
         <table className={classes.nestedTable}>
@@ -37,17 +56,22 @@ const PdfViewer = () => {
     if (Array.isArray(value)) {
       return value.join(", ");
     }
-    return value.toString();
+    if (key === "date_submitted") {
+      return new Date(value).toISOString().split("T")[0]; // Format date
+    }
+    return formatSpecialValue(key, value);
   };
 
   const formatMetadata = (data) => {
     if (!data) return null;
-    return Object.entries(data).map(([key, value]) => (
-      <tr key={key}>
-        <td className={classes.metadataKey}>{formatKey(key)}</td>
-        <td className={classes.metadataValue}>{formatValue(value)}</td>
-      </tr>
-    ));
+    return Object.entries(data)
+      .filter(([key]) => !excludedFields.includes(key))
+      .map(([key, value]) => (
+        <tr key={key}>
+          <td className={classes.metadataKey}>{formatKey(key)}</td>
+          <td className={classes.metadataValue}>{formatValue(key, value)}</td>
+        </tr>
+      ));
   };
 
   return (
