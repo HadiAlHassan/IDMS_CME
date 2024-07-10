@@ -27,8 +27,9 @@ class UserSerializer(serializers.ModelSerializer):
             'last_name': {'required': False},
         }
 
-
+ 
 class CaseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Case
         fields = '__all__'
+ 

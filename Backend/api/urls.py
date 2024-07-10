@@ -3,6 +3,7 @@ from api import views
 from Pdf import pdf_handling
 from WebScraping import WS_handling
 from gen_ai import chat_bot
+from Cases import cases_handling
 # from gen_ai import rag 
 from users import user_functions
 
@@ -22,4 +23,8 @@ urlpatterns = [ #redirects to api/views.py
     path('login', user_functions.login, name='login'),
     path('get-news', WS_handling.get_news, name="get_news"),
    # path('rag', rag.rag, name='rag')
+    path('create-case', cases_handling.create_case, name='create_case'),
+    path('update-case-status', cases_handling.update_case_status, name='update_case_status'),
+    path('add-documents-to-case', cases_handling.add_documents_to_case, name='add_documents_to_case'),
+    path('get-all-titles', cases_handling.get_all_titles, name='get_all_titles')
 ]

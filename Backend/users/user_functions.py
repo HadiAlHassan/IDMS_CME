@@ -29,7 +29,7 @@ def login(request):
         try:
             django_user = User.objects.get(email=email)
             if django_user.firebase_uid == firebase_uid:
-                return Response({"message": "Successfully logged in!", "user": user}, status=status.HTTP_200_OK)
+                return Response({"message": "Successfully logged in!", "user": user, "firebase_uid": firebase_uid}, status=status.HTTP_200_OK)
             else:
                 return Response({"message": "User ID mismatch."}, status=status.HTTP_400_BAD_REQUEST)
         except User.DoesNotExist:

@@ -146,7 +146,7 @@ class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(_('email address'), unique=True)
     username = None
-    firebase_uid = models.CharField(max_length=255, blank=True, null=True)
+    firebase_uid = models.CharField(max_length=255, blank=True, null=True, unique=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
@@ -176,3 +176,16 @@ class User(AbstractUser):
         verbose_name = _('user')
         ordering = ['-date_joined']
         verbose_name_plural = _('users')
+
+from django.conf import settings
+
+class Case(models.Model):
+    name = models.CharField(max_length=255)
+    client = models.CharField(max_length=255)
+    status = models.CharField(max_length=255)
+    time = models.DateField()
+    documents_related = models.JSONField(default=list)
+    trial_date = models.DateField()
+    user = models.ForeignKey(User, to_field='firebase_uid', on_delete=models.CASCADE, related_name='cases')
+    def __str__(self):
+        return self.name
