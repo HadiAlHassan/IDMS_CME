@@ -1,8 +1,7 @@
-.casesContainer {
+.caseDetailContainer {
   display: flex;
-  flex-wrap: wrap;
   justify-content: center;
-  gap: 20px;
+  align-items: center;
   padding: 20px;
   background-color: #f5f5f5;
   border-radius: 8px;
@@ -10,16 +9,12 @@
   margin-top: 20px;
 }
 
-.caseCard {
-  width: 300px;
+.caseDetailCard {
+  width: 100%;
+  max-width: 800px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.caseCard:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  padding: 20px;
 }
 
 .caseTitle {
@@ -30,12 +25,6 @@
 
 .caseDetail {
   margin-bottom: 10px;
-}
-
-.fab {
-  position: fixed !important;
-  bottom: 16px;
-  right: 16px;
 }
 
 .openStatus {

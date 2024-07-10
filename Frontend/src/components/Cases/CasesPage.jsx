@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Box, Card, CardContent, Typography, Grid, Fab } from "@mui/material";
+import { Card, CardContent, Typography, Fab } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import classes from "./CasesPage.module.css";
 import Header from "../Header/Header";
 import AddCaseModal from "../Cases/AddCaseModal";
 import AddIcon from "@mui/icons-material/Add";
+
 const mockData = [
   {
     id: 1,
@@ -12,10 +14,7 @@ const mockData = [
     caseStatus: "Open",
     openedDate: "2024-07-01T12:00:00Z",
     trialDates: ["2024-08-01", "2024-09-01"],
-    documents: [
-      { name: "Document 1", link: "http://example.com/doc1" },
-      { name: "Document 2", link: "http://example.com/doc2" },
-    ],
+    documents: ["Document 1", "Document 2"],
   },
   {
     id: 2,
@@ -93,12 +92,13 @@ const mockData = [
 
 const CasesPage = () => {
   const [cases, setCases] = useState([]);
-
   const [openAddCaseModal, setOpenAddCaseModal] = useState(false);
+  const navigate = useNavigate();
+
   useEffect(() => {
-    // Simulating an API call with mock data
     setCases(mockData);
   }, []);
+
   const handleOpenAddCaseModal = () => {
     setOpenAddCaseModal(true);
   };
@@ -107,12 +107,26 @@ const CasesPage = () => {
     setOpenAddCaseModal(false);
   };
 
+  const handleCaseClick = (id) => {
+    navigate(`/cases/${id}`);
+  };
+
+  const getStatusClass = (status) => {
+    if (status === "Open") return classes.openStatus;
+    if (status === "Closed") return classes.closedStatus;
+    if (status === "Pending") return classes.pendingStatus;
+  };
+
   return (
     <>
       <Header />
       <div className={classes.casesContainer}>
         {cases.map((caseItem) => (
-          <Card key={caseItem.id} className={classes.caseCard}>
+          <Card
+            key={caseItem.id}
+            className={classes.caseCard}
+            onClick={() => handleCaseClick(caseItem.id)}
+          >
             <CardContent>
               <Typography variant="h5" className={classes.caseTitle}>
                 {caseItem.caseName}
@@ -120,30 +134,12 @@ const CasesPage = () => {
               <Typography className={classes.caseDetail}>
                 Client: {caseItem.clientName}
               </Typography>
-              <Typography className={classes.caseDetail}>
+              <Typography
+                className={`${classes.caseDetail} ${getStatusClass(
+                  caseItem.caseStatus
+                )}`}
+              >
                 Status: {caseItem.caseStatus}
-              </Typography>
-              <Typography className={classes.caseDetail}>
-                Opened: {new Date(caseItem.openedDate).toLocaleString()}
-              </Typography>
-              <Typography className={classes.caseDetail}>
-                Important Dates: {caseItem.trialDates.join(", ")}
-              </Typography>
-              <Typography className={classes.caseDetail}>
-                Related Documents:
-                <ul>
-                  {caseItem.documents.map((doc, index) => (
-                    <li key={index}>
-                      <a
-                        href={doc.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {doc.name}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
               </Typography>
             </CardContent>
           </Card>

@@ -9,6 +9,7 @@ import "./index.css";
 import { AuthProvider } from "./components/Context/AuthContext";
 import Profile from "./components/Profile/ProfilePage";
 import CasesPage from "./components/Cases/CasesPage";
+import CaseDetailPage from "./components/Cases/CaseDetailPage";
 function App() {
   return (
     <AuthProvider>
@@ -32,6 +33,10 @@ function App() {
             <Route
               path="/cases"
               element={<PrivateRoute element={CasesPage} />}
+            />
+            <Route
+              path="/cases/:id"
+              element={<PrivateRoute element={CaseDetailPage} />}
             />
           </Routes>
         </div>

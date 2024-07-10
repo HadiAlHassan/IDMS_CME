@@ -5,27 +5,37 @@ import {
   Typography,
   TextField,
   Button,
+  Menu,
   MenuItem,
 } from "@mui/material";
-import classes from "./AddCaseModal.module.css";
+import classes from "./EditCaseModal.module.css";
 
-const AddCaseModal = ({ open, onClose }) => {
-  const [caseName, setCaseName] = useState("");
-  const [clientName, setClientName] = useState("");
-  const [caseStatus, setCaseStatus] = useState("");
-  const [openedDate, setOpenedDate] = useState("");
-  const [trialDate, setTrialDate] = useState("");
+const EditCaseModal = ({ open, onClose, caseItem, onSave }) => {
+  const [caseName, setCaseName] = useState(caseItem.caseName);
+  const [clientName, setClientName] = useState(caseItem.clientName);
+  const [caseStatus, setCaseStatus] = useState(caseItem.caseStatus);
+  const [openedDate, setOpenedDate] = useState(caseItem.openedDate);
+  const [trialDates, setTrialDates] = useState(caseItem.trialDates.join(", "));
+  const [documents, setDocuments] = useState(caseItem.documents.join(", "));
 
   const handleSave = () => {
-    // Logic to save the new case
-    onClose();
+    const updatedCase = {
+      ...caseItem,
+      caseName,
+      clientName,
+      caseStatus,
+      openedDate,
+      trialDates: trialDates.split(", "),
+      documents: documents.split(", "),
+    };
+    onSave(updatedCase);
   };
 
   return (
     <Modal open={open} onClose={onClose}>
       <Box className={classes.modalBox}>
         <Typography variant="h6" gutterBottom>
-          Add New Case
+          Edit Case
         </Typography>
         <TextField
           label="Case Name"
@@ -50,10 +60,11 @@ const AddCaseModal = ({ open, onClose }) => {
           margin="normal"
         >
           <MenuItem value="Open">Open</MenuItem>
+          <MenuItem value="Closed">Closed</MenuItem>
           <MenuItem value="Pending">Pending</MenuItem>
         </TextField>
         <TextField
-          label="Open Date"
+          label="Opened Date"
           type="date"
           value={openedDate}
           onChange={(e) => setOpenedDate(e.target.value)}
@@ -66,13 +77,21 @@ const AddCaseModal = ({ open, onClose }) => {
         <TextField
           label="Trial Date"
           type="date"
-          value={trialDate}
-          onChange={(e) => setTrialDate(e.target.value)}
+          value={trialDates}
+          onChange={(e) => setTrialDates(e.target.value)}
           fullWidth
           margin="normal"
           InputLabelProps={{
             shrink: true,
           }}
+        />
+        <TextField
+          label="Documents"
+          value={documents}
+          onChange={(e) => setDocuments(e.target.value)}
+          fullWidth
+          margin="normal"
+          helperText="Comma separated values"
         />
         <Box mt={2} display="flex" justifyContent="flex-end">
           <Button onClick={onClose} className={classes.cancelButton}>
@@ -92,4 +111,4 @@ const AddCaseModal = ({ open, onClose }) => {
   );
 };
 
-export default AddCaseModal;
+export default EditCaseModal;
