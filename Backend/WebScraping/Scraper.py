@@ -286,7 +286,19 @@ from Nlp.metadata_url import Scraper as Scrape_luido
 import os
 
 
-
+import chromadb
+import tempfile
+from llama_index.vector_stores.chroma import ChromaVectorStore
+from llama_index.core import StorageContext
+from llama_parse import LlamaParse
+from llama_index.llms.cohere import Cohere
+from llama_index.core import SimpleDirectoryReader
+from llama_index.core import Settings
+from llama_index.core import VectorStoreIndex
+from llama_index.embeddings.cohere.base import CohereEmbedding
+from llama_index.postprocessor.cohere_rerank import CohereRerank
+from llama_index.core import StorageContext, load_index_from_storage
+from initializations.initializer import parser, index
 
 
 class DomainSource(Enum):
@@ -490,8 +502,24 @@ class Scraper:
 
             if title and content:
                 self.__save_to_mongo(title, content, url)
-                
+                filename = f"{title}.txt"
+                filtered_filename = filename.replace(":", "").replace("/", "_").replace("\n"," ").replace("\r"," ")
 
+                with open(filtered_filename,"w",encoding="utf-8") as temp_file:
+                    temp_file.write(content)
+
+                print(os.getcwd())
+                print(os.path.exists(filtered_filename))
+                file_extractor = {".txt": parser}
+
+                documents = SimpleDirectoryReader(input_files=[filtered_filename],
+                                                    file_extractor = file_extractor).load_data()
+                print("document Parsed!")
+                directory = os.getcwd()
+                os.remove(f"{directory}/{filtered_filename}")
+                print("Document temp file deleted")
+                index.insert(documents[0])
+                print("document pasred")
 
 
 
