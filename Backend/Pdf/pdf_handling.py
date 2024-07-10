@@ -21,25 +21,9 @@ from Nlp.nlp_analysis import extract_metadata_pdf
 from api.models import CategoryDocumentCount
 from Nlp.nlp_analysis_optimized import extract_metadata, summarize_pdf
 
-import chromadb
-import tempfile
-from llama_index.vector_stores.chroma import ChromaVectorStore
-from llama_index.core import StorageContext
+
 import os
-from dotenv import load_dotenv
-from llama_parse import LlamaParse
-from llama_index.llms.cohere import Cohere
-from llama_index.core import SimpleDirectoryReader
-from llama_index.core import Settings
-from llama_index.core import VectorStoreIndex
-from llama_index.core import SummaryIndex
-from llama_index.embeddings.cohere.base import CohereEmbedding
-from llama_index.postprocessor.cohere_rerank import CohereRerank
-from llama_index.core.indices.prompt_helper import PromptHelper
-from llama_index.core.node_parser import HierarchicalNodeParser
-from llama_index.core.node_parser import SentenceSplitter
-from llama_index.core import StorageContext, load_index_from_storage
-from WebScraping.initializations import parser, index
+
 
 
 
@@ -88,24 +72,6 @@ def add_pdf(request):
                 return Response({'error': 'Failed to add DocGeneralInfo', 'details': general_info_serializer.errors}, status=400)
             
             content = get_text_from_pdf(file_id)
-
-            filename = f"{title}.txt"
-            filtered_filename = filename.replace(":", "").replace("/", "_").replace("\n"," ").replace("\r"," ")
-
-            with open(filtered_filename,"w",encoding="utf-8") as temp_file:
-                temp_file.write(content)
-
-            file_extractor = {".txt": parser}
-
-            documents = SimpleDirectoryReader(input_files=[filtered_filename],
-                                                file_extractor = file_extractor).load_data()
-            print("document sent to llamaparse")
-            directory = os.getcwd()
-            os.remove(f"{directory}/{filtered_filename}")
-            print("Document temp file deleted")
-            index.insert(documents[0])
-            print("document inserted to index!")
-
             category = "Other"
             ner = {}
             if content != "":
@@ -120,7 +86,6 @@ def add_pdf(request):
                 'language': "en",  # Example language, change as needed  metadata_dict1["language"]
                 'ner': ner,  
                 'confidentiality_level': metadata_dict1["confidentiality"],  # Example confidentiality level, change as needed
-                'location': metadata_dict1["locations"],  # Example location, change as needed
                 'references': metadata_dict1["references"],
                 'in_text_citations': metadata_dict1["in_text_citations"],  # Example uploader, change as needed
                 'word_count': metadata_dict1["word_count"]
@@ -128,7 +93,7 @@ def add_pdf(request):
             nlp_analysis_serializer = NlpAnalysisSerializer(data=nlp_analysis_data)
             if nlp_analysis_serializer.is_valid():
                 nlp_analysis_serializer.save()
-                #test_word_cloud(content)
+                test_word_cloud(content)
             else:
                 
                 return Response({'error': 'Failed to add NlpAnalysis', 'details': nlp_analysis_serializer.errors}, status=400)

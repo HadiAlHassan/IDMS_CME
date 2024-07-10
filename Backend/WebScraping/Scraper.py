@@ -283,27 +283,8 @@ from Nlp.categorization import predict_label_from_string
 from Nlp.name_entity_recognition import extract_information
 from Nlp.nlp_analysis import extract_metadata_text
 from Nlp.metadata_url import Scraper as Scrape_luido
-
-import chromadb
-import tempfile
-from llama_index.vector_stores.chroma import ChromaVectorStore
-from llama_index.core import StorageContext
 import os
-from dotenv import load_dotenv
-from llama_parse import LlamaParse
-from llama_index.llms.cohere import Cohere
-from llama_index.core import SimpleDirectoryReader
-from llama_index.core import Settings
-from llama_index.core import VectorStoreIndex
-from llama_index.core import SummaryIndex
-from llama_index.embeddings.cohere.base import CohereEmbedding
-from llama_index.postprocessor.cohere_rerank import CohereRerank
-from llama_index.core.indices.prompt_helper import PromptHelper
-from llama_index.core.node_parser import HierarchicalNodeParser
-from llama_index.core.node_parser import SentenceSplitter
-from llama_index.core import StorageContext, load_index_from_storage
-from WebScraping.initializations import parser, index
-load_dotenv()
+
 
 
 
@@ -451,7 +432,9 @@ class Scraper:
                 }
             general_info_serializer = DocGeneralInfoSerializer(data=general_info_data)
             if general_info_serializer.is_valid():
+                
                 general_info = general_info_serializer.save()
+                print("saved to general_info")
             else:
                 raise ScrapingException("Error in saving document general info to MongoDB")
             
@@ -466,16 +449,19 @@ class Scraper:
                 'language': metadata_dict["language"],  # Example language, change as needed
                 'ner': ner,  
                 'confidentiality_level': metadata_dict["confidentiality"],  # Example confidentiality level, change as needed
-                'location': metadata_dict["locations"],  # Example location, change as needed
                 'references': metadata_dict["references"],
                 'in_text_citations': metadata_dict["in_text_citations"],  # Example uploader, change as needed
                 'word_count': metadata_dict["word_count"]
             }
             nlp_analysis_serializer = NlpAnalysisSerializer(data=nlp_analysis_data)
+            print("before checking for serializer")
             if nlp_analysis_serializer.is_valid():
+                print("after i check for serializer")
                 nlp_analysis_serializer.save()
+                print("saved to nlp_analysis")
                 test_word_cloud(content)
             else:
+                print(nlp_analysis_serializer.errors)
                 raise ScrapingException("Error in saving document general info to MongoDB")
             
         except Exception as e:
@@ -504,25 +490,7 @@ class Scraper:
 
             if title and content:
                 self.__save_to_mongo(title, content, url)
-                filename = f"{title}.txt"
-                filtered_filename = filename.replace(":", "").replace("/", "_").replace("\n"," ").replace("\r"," ")
-
-                with open(filtered_filename,"w",encoding="utf-8") as temp_file:
-                    temp_file.write(content)
-
-                print(os.getcwd())
-                print(os.path.exists(filtered_filename))
-                file_extractor = {".txt": parser}
-
-                # #assume we loaded it from the mongodb
-                documents = SimpleDirectoryReader(input_files=[filtered_filename],
-                                                   file_extractor = file_extractor).load_data()
-                # print("document Parsed!")
-                directory = os.getcwd()
-                os.remove(f"{directory}/{filtered_filename}")
-                # print("Document temp file deleted")
-                index.insert(documents[0])
-                # print("document pasred")
+                
 
 
 

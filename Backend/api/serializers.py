@@ -15,7 +15,7 @@ class NlpAnalysisSerializer(serializers.ModelSerializer):
         fields = ['_id',
             'nlp_id', 'document_type', 'summary',  'category',
              'language', 'ner', 'confidentiality_level',
-            'location', 'references', 'in_text_citations', 'word_count'
+             'references', 'in_text_citations', 'word_count'
         ]
 
 class UserSerializer(serializers.ModelSerializer):

@@ -69,7 +69,6 @@ class NlpAnalysis(models.Model):
     language = models.TextField()
     ner = models.JSONField()
     confidentiality_level = models.BooleanField()
-    location = models.JSONField()
     references = models.JSONField()
     in_text_citations=models.JSONField()
     word_count = models.IntegerField()
