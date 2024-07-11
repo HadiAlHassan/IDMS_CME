@@ -84,7 +84,7 @@ def add_pdf(request):
                 return Response({'error': 'Failed to add DocGeneralInfo', 'details': general_info_serializer.errors}, status=400)
             
             content = get_text_from_pdf(file_id)
-
+            print("content of the pdf is:", content)
             filename = f"{title}.txt"
             filtered_filename = filename.replace(":", "").replace("/", "_").replace("\n"," ").replace("\r"," ")
 

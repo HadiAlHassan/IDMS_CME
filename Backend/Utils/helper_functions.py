@@ -1,5 +1,7 @@
 from pymongo import errors
 from functools import wraps
+import pymupdf
+from fpdf import FPDF
 import fitz
 from bson import ObjectId
 
@@ -74,19 +76,21 @@ def get_nlp_analysis_metadata(pdf_title):
     
     serializer = NlpAnalysisSerializer(docs, many=True)
     return serializer.data
-
+import io
+import logging
 def get_text_from_pdf(file_id):
     try:
         fs = connect_to_gridfs()
         file = fs.get(ObjectId(file_id))
-        doc = fitz.open(stream=file.read(), filetype="pdf")
-        
-        content = ""
-        for page in doc:
-            content += page.get_text()
-        
+
+        with io.BytesIO(file.read()) as file_stream:
+            doc = pymupdf.open(stream=file_stream, filetype="pdf")
+            content = ""
+            for page in doc:
+                content += page.get_text()
         return content
     except Exception as e:
+        logging.error(f"Error extracting text from PDF: {e}")
         return str(e)
 
 def get_text_from_txt(file_id):

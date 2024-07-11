@@ -253,7 +253,7 @@
 #     scrpay = Scraper()
 #     url = input()
 #     scrpay.Scrape(url)
-
+import logging
 import time  
 from enum import Enum
 from WebScraping.ScrapingException import ScrapingException
@@ -284,8 +284,8 @@ from Nlp.name_entity_recognition import extract_information
 from Nlp.nlp_analysis import extract_metadata_text
 from Nlp.metadata_url import Scraper as Scrape_luido
 import os
-
-
+import fitz
+from fpdf import FPDF
 import chromadb
 import tempfile
 from llama_index.vector_stores.chroma import ChromaVectorStore
@@ -406,7 +406,7 @@ class Scraper:
         try:
             fs = connect_to_gridfs()
             db = connect_to_mongo()
-            filename = f"{title}.txt"
+            filename = f"{title}.pdf"
             filtered_filename = filename.replace(":", "").replace("/", "_").replace("\n"," ").replace("\r"," ")
 
             scrape_luido = Scrape_luido()
@@ -416,69 +416,71 @@ class Scraper:
             if existing_file:
                 return Response({'error': 'File already exists'}, status=400)
             ner = {}
-            file_id = fs.put(content.encode('utf-8'), filename=filtered_filename)
-            content = get_text_from_txt(file_id)
-            ner = {}
-            if content!="":
-                    category = predict_label_from_string(content)
-                    ner = extract_information(content)
-                    metadata_dict = extract_metadata_text(content)
+
+            try:
+                pdf = FPDF()
+                pdf.add_page()
+                pdf.set_font("Arial", size=12)
+                for line in content.split('\n'):
+                    pdf.multi_cell(0, 10, line.encode('latin-1', 'replace').decode('latin-1'))
+
+                pdf_output = pdf.output(dest='S').encode('latin-1')
+
+                file_id = fs.put(pdf_output, filename=filtered_filename)
+                
+            except Exception as e:
+                logging.error(f"Error generating PDF: {e}")
+
+            
+            category = predict_label_from_string(content)
+            ner = extract_information(content)
+            metadata_dict = extract_metadata_text(content)
+
             title = filtered_filename
             if metadata_dict1['title'] != "No title found":
                 title = metadata_dict1["title"]
-                print("ana hon !!!!!")
                 existing_website = fs.find_one({'filename': title})
-                print("ana honikkk!!!!!")
                 if existing_website:
                     fs.delete(file_id)
                     raise ScrapingException("This content already exists in the database.")
-            
+
             db.fs.files.update_one({'_id': file_id}, {'$set': {'filename': title}})
-            print("hele rommane!!!!!")
+
             with transaction.atomic():
-            # Save DocGeneralInfo
                 general_info_data = {
                     'source': url,
                     'title':  title,
-                    'author':metadata_dict1["author"]
+                    'author': metadata_dict1["author"]
                 }
-            general_info_serializer = DocGeneralInfoSerializer(data=general_info_data)
-            if general_info_serializer.is_valid():
-                
-                general_info = general_info_serializer.save()
-                print("saved to general_info")
-            else:
-                raise ScrapingException("Error in saving document general info to MongoDB")
-            
-            category = "Other"
-            
-            # Save NlpAnalysis
-            nlp_analysis_data = {
-                'nlp_id': general_info.nlp_id,
-                'document_type': 'URL',
-                'summary': metadata_dict1["summary"],  # Add your summarization logic here
-                'category': category,  # Example category, change as needed
-                'language': metadata_dict["language"],  # Example language, change as needed
-                'ner': ner,  
-                'confidentiality_level': metadata_dict["confidentiality"],  # Example confidentiality level, change as needed
-                'references': metadata_dict["references"],
-                'in_text_citations': metadata_dict["in_text_citations"],  # Example uploader, change as needed
-                'word_count': metadata_dict["word_count"]
-            }
-            nlp_analysis_serializer = NlpAnalysisSerializer(data=nlp_analysis_data)
-            print("before checking for serializer")
-            if nlp_analysis_serializer.is_valid():
-                print("after i check for serializer")
-                nlp_analysis_serializer.save()
-                print("saved to nlp_analysis")
-                test_word_cloud(content)
-            else:
-                print(nlp_analysis_serializer.errors)
-                raise ScrapingException("Error in saving document general info to MongoDB")
-            
+                general_info_serializer = DocGeneralInfoSerializer(data=general_info_data)
+                if general_info_serializer.is_valid():
+                    general_info = general_info_serializer.save()
+                else:
+                    raise ScrapingException("Error in saving document general info to MongoDB")
+
+                category = "Other"
+
+                nlp_analysis_data = {
+                    'nlp_id': general_info.nlp_id,
+                    'document_type': 'URL',
+                    'summary': metadata_dict1["summary"],
+                    'category': category,
+                    'language': metadata_dict["language"],
+                    'ner': ner,
+                    'confidentiality_level': metadata_dict["confidentiality"],
+                    'references': metadata_dict["references"],
+                    'in_text_citations': metadata_dict["in_text_citations"],
+                    'word_count': metadata_dict["word_count"]
+                }
+                nlp_analysis_serializer = NlpAnalysisSerializer(data=nlp_analysis_data)
+                if nlp_analysis_serializer.is_valid():
+                    nlp_analysis_serializer.save()
+                    test_word_cloud(content)
+                else:
+                    raise ScrapingException("Error in saving document analysis to MongoDB")
+
         except Exception as e:
             raise ScrapingException(f"An error occurred while saving the content: {e}")
-
     def __extract_webpage_content(self, soup, tags):
         
         title_tag = soup.find(tags['title']['tag'], class_= tags['title'].get('class'), id = tags['title'].get('id'))
