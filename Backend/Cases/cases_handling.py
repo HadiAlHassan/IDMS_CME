@@ -287,3 +287,25 @@ def get_upcoming_trials(request):
     except Exception as e:
         logger.error(f"Unexpected error: {str(e)}", exc_info=True)
         return Response({'error': 'An unexpected error occurred'}, status=500)
+    
+@timing_decorator
+@api_view(['GET'])
+def get_case_counts(request):
+    try:
+        # Connect to MongoDB
+        db = connect_to_mongo()
+ 
+        # Count cases by their status
+        open_count = db.cases.count_documents({'status': 'Open'})
+        closed_count = db.cases.count_documents({'status': 'Closed'})
+        pending_count = db.cases.count_documents({'status': 'Pending'})
+ 
+        return Response({
+            'Open': open_count,
+            'Closed': closed_count,
+            'Pending': pending_count
+        }, status=200)
+ 
+    except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")
+        return Response({'error': 'An unexpected error occurred'}, status=500)

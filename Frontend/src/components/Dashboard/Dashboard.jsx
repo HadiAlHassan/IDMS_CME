@@ -6,6 +6,7 @@ import classes from "./Dashboard.module.css";
 import { UpdateContext } from "../Context/UpdateContext";
 import { useContext, useState, useEffect } from "react";
 import UpcomingTrialsCard from "./UpcomingTrialsCard";
+import CaseStatusBarChart from "./CaseStatusBar";
 // import CasesStatusCard from "./CasesStatusCard";
 // import CasesBarGraph from "./CasesBarGraph";
 // import ClientsListCard from "./ClientsListCard";
@@ -44,10 +45,11 @@ function Dashboard() {
           <UpcomingTrialsCard />
         </CardContent>
       </Card>
-
-      {/* <CasesStatusCard />
-      <CasesBarGraph />
-      <ClientsListCard /> */}
+      <Card className={classes.column}>
+        <CardContent>
+          <CaseStatusBarChart />
+        </CardContent>
+      </Card>
     </div>
   );
 }

@@ -1,0 +1,19 @@
+/* CaseStatusBarChart.module.css */
+.card {
+  background-color: #3494e3 !important; /* Example background color */
+  border-radius: 8px; /* Example border radius */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Example shadow */
+  margin: 1rem;
+  padding: 1rem;
+}
+.title {
+  font-size: 20px;
+  text-align: center; /* Center the text */
+  margin-top: 0;
+  color: white;
+}
+.cardContent {
+  background-color: white; /* Setting the background to white */
+  border-radius: 8px;
+  padding: 1rem;
+}

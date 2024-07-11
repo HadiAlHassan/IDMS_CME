@@ -28,5 +28,6 @@ urlpatterns = [ #redirects to api/views.py
     path('get-all-titles', cases_handling.get_all_titles, name='get_all_titles'),
     path('get-cases-by-user', cases_handling.get_cases_by_user, name='get_cases_by_user'),
     path('get-case-details', cases_handling.get_case_details, name='get_case_details'),
-    path('upcoming-trials', cases_handling.get_upcoming_trials, name='get_upcoming_trials')
+    path('upcoming-trials', cases_handling.get_upcoming_trials, name='get_upcoming_trials'),
+    path('total-company-cases', cases_handling.get_case_counts, name='get_case_counts')
 ]
