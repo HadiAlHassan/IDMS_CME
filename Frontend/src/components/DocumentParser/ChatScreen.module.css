@@ -1,0 +1,66 @@
+.dialogPaper {
+  position: fixed !important;
+  right: 0 !important;
+  bottom: 80px !important; /* Ensure it stays above the floating action button */
+  top: auto !important;
+  height: 60% !important; /* Adjust height as needed */
+  width: 400px !important; /* Adjust width as needed */
+  margin: 0 !important;
+  border-radius: 12px 12px 12px 12px !important;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 768px) {
+  .dialogPaper {
+    width: 100% !important;
+    height: 50% !important;
+    bottom: 0 !important;
+    right: 0 !important;
+    border-radius: 12px 12px 12px 12px !important;
+  }
+}
+
+.chatContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.messagesContainer {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+  border-bottom: 1px solid #ddd;
+}
+
+.message {
+  display: flex;
+  margin: 10px 0; /* Add vertical spacing between messages */
+}
+
+.userMessage {
+  background-color: #1769aa;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 15px;
+  max-width: 70%;
+  word-wrap: break-word;
+  margin-left: auto; /* Align to the right */
+  margin-bottom: 10px; /* Ensure there's spacing below user messages */
+}
+
+.assistantMessage {
+  background-color: #f1f1f1;
+  padding: 8px 12px;
+  border-radius: 15px;
+  max-width: 70%;
+  word-wrap: break-word;
+  margin-right: auto; /* Align to the left */
+  margin-bottom: 10px; /* Ensure there's spacing below user messages */
+}
+
+.textField {
+  width: calc(100% - 20px);
+  margin: 10px;
+}

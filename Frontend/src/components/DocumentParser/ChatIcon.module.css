@@ -1,0 +1,15 @@
+.floatingActionButtonContainer {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 1000;
+}
+
+.floatingActionButton {
+  background-color: #1769aa !important;
+  color: #ffffff !important;
+}
+
+.floatingActionIcon {
+  font-size: 2rem;
+}
