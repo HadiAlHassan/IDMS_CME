@@ -1,0 +1,41 @@
+.card {
+  background-color: #3494e3 !important; /* Example background color */
+  border-radius: 8px; /* Example border radius */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Example shadow */
+  margin: 1rem;
+  padding: 1rem;
+}
+.title {
+  font-size: 20px;
+  text-align: center; /* Center the text */
+  margin-top: 0;
+  color: white;
+}
+
+.clientsContainer {
+  background-color: #3494e3;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+  gap: 1rem !important;
+  border-radius: 8px !important;
+}
+.clientCard {
+  background-color: white !important; /* White background for list items */
+  border-radius: 8px !important; /* Rounded corners */
+  margin: 0.75rem !important; /* Space between items */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important; /* Light shadow */
+  padding: 0.5rem !important; /* Padding inside the item */
+  width: 150px !important; /* Adjust width as needed */
+  text-align: center;
+}
+.clientName {
+  color: black;
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+}
+.cardContent {
+  background-color: white; /* Setting the background to white */
+  border-radius: 1rem !important;
+  padding: 1rem !important;
+}

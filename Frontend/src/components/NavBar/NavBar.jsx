@@ -37,8 +37,6 @@ export default function NavBar() {
           { text: "Profile", icon: <AccountCircleIcon />, path: "/profile" },
           { text: "Dashboard", icon: <DashboardIcon />, path: "/homepage" },
           { text: "Cases", icon: <FolderIcon />, path: "/cases" },
-          { text: "Clients", icon: <PeopleIcon />, path: "/clients" },
-          { text: "Calendar", icon: <EventIcon />, path: "/calendar" },
         ].map((item) => (
           <ListItem key={item.text} disablePadding>
             <ListItemButton onClick={() => handleNavigation(item.path)}>

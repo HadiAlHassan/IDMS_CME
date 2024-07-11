@@ -16,7 +16,14 @@ function HomePage() {
       <div className="Homepage">
         <Header />
         <Container>
-          <div className="flexContainer">
+          <div
+            className="flexContainer"
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
             <div className="addPdfContainer">
               <AddPdf />
             </div>

@@ -309,3 +309,75 @@ def get_case_counts(request):
     except Exception as e:
         logger.error(f"Unexpected error: {str(e)}")
         return Response({'error': 'An unexpected error occurred'}, status=500)
+    
+@timing_decorator
+@api_view(['POST'])
+def get_user_case_counts(request):
+    try:
+        # Extract user_id from request
+        user_id = request.data.get('user_id')
+ 
+        # Validate required field
+        if not user_id:
+            return Response({'error': 'user_id is required'}, status=400)
+ 
+        # Connect to MongoDB
+        db = connect_to_mongo()
+ 
+        # Check if the user exists in the user collection
+        user_exists = db.user.find_one({'firebase_uid': user_id})
+        if not user_exists:
+            return Response({'error': 'User does not exist'}, status=404)
+ 
+        # Count cases by their status for the given user_id
+        open_count = db.cases.count_documents({'user_id': user_id, 'status': 'Open'})
+        closed_count = db.cases.count_documents({'user_id': user_id, 'status': 'Closed'})
+        pending_count = db.cases.count_documents({'user_id': user_id, 'status': 'Pending'})
+ 
+        return Response({
+            'Open': open_count,
+            'Closed': closed_count,
+            'Pending': pending_count
+        }, status=200)
+ 
+    except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")
+        return Response({'error': 'An unexpected error occurred'}, status=500)
+    
+@timing_decorator
+@api_view(['POST'])
+def get_user_clients(request):
+    try:
+        # Extract user_id from request
+        user_id = request.data.get('user_id')
+ 
+        # Validate required field
+        if not user_id:
+            return Response({'error': 'user_id is required'}, status=400)
+ 
+        # Connect to MongoDB
+        db = connect_to_mongo()
+ 
+        # Check if the user exists in the user collection
+        user_exists = db.user.find_one({'firebase_uid': user_id})
+        if not user_exists:
+            return Response({'error': 'User does not exist'}, status=404)
+ 
+        # Retrieve clients for "Open" and "Pending" cases for the given user_id
+        open_cases = db.cases.find({'user_id': user_id, 'status': 'Open'})
+        pending_cases = db.cases.find({'user_id': user_id, 'status': 'Pending'})
+ 
+        # Extract clients from the cases and remove duplicates
+        open_clients = set(case.get('client') for case in open_cases)
+        pending_clients = set(case.get('client') for case in pending_cases)
+ 
+        # Combine clients into a single list and remove duplicates
+        all_clients = list(open_clients.union(pending_clients))
+ 
+        return Response({
+            'clients': all_clients
+        }, status=200)
+ 
+    except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")
+        return Response({'error': 'An unexpected error occurred'}, status=500)

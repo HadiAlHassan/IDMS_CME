@@ -1,0 +1,53 @@
+.card {
+  background-color: #3494e3 !important; /* Example background color */
+  border-radius: 8px; /* Example border radius */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Example shadow */
+  margin: 1rem;
+  padding: 1rem;
+}
+.title {
+  font-size: 20px;
+  text-align: center; /* Center the text */
+  margin-top: 0;
+  color: white;
+}
+.cardContent {
+  background-color: white; /* Setting the background to white */
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.circlesContainer {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 1rem;
+}
+
+.circleItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0 1rem;
+}
+
+.circleLabel {
+  margin-bottom: 0.5rem;
+  color: black;
+}
+
+.circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  color: white;
+}
+
+.circleValue {
+  font-size: 20px;
+  color: white;
+}

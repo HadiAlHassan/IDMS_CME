@@ -7,10 +7,9 @@ import { UpdateContext } from "../Context/UpdateContext";
 import { useContext, useState, useEffect } from "react";
 import UpcomingTrialsCard from "./UpcomingTrialsCard";
 import CaseStatusBarChart from "./CaseStatusBar";
-// import CasesStatusCard from "./CasesStatusCard";
-// import CasesBarGraph from "./CasesBarGraph";
-// import ClientsListCard from "./ClientsListCard";
+import ClientListCard from "./ClientsList";
 import SelectImage from "../SelectComponent/ImageSelect";
+import UserCaseCountsCard from "./UserCaseCount";
 
 function Dashboard() {
   const { updateWordCloud } = useContext(UpdateContext);
@@ -48,6 +47,16 @@ function Dashboard() {
       <Card className={classes.column}>
         <CardContent>
           <CaseStatusBarChart />
+        </CardContent>
+      </Card>
+      <Card className={classes.column}>
+        <CardContent>
+          <UserCaseCountsCard />
+        </CardContent>
+      </Card>
+      <Card className={classes.column}>
+        <CardContent>
+          <ClientListCard />
         </CardContent>
       </Card>
     </div>

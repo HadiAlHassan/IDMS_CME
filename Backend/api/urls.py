@@ -29,5 +29,7 @@ urlpatterns = [ #redirects to api/views.py
     path('get-cases-by-user', cases_handling.get_cases_by_user, name='get_cases_by_user'),
     path('get-case-details', cases_handling.get_case_details, name='get_case_details'),
     path('upcoming-trials', cases_handling.get_upcoming_trials, name='get_upcoming_trials'),
-    path('total-company-cases', cases_handling.get_case_counts, name='get_case_counts')
+    path('total-company-cases', cases_handling.get_case_counts, name='get_case_counts'),
+    path('user-case-counts', cases_handling.get_user_case_counts, name='get_user_case_counts'),
+    path('user-clients', cases_handling.get_user_clients, name='get_user_clients')
 ]

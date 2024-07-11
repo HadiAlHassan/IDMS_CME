@@ -83,7 +83,7 @@ const CaseDetailPage = () => {
               Opened: {new Date(updatedCase.time).toLocaleString()}
             </Typography>
             <Typography className={classes.caseDetail}>
-              Important Dates: {updatedCase.trial_date}
+              Trial Date: {updatedCase.trial_date}
             </Typography>
             <Typography className={classes.caseDetail}>
               Related Documents:
