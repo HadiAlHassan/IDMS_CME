@@ -2,14 +2,14 @@ import React from "react";
 import { useLocation } from "react-router-dom";
 import classes from "./PdfViewer.module.css";
 import Header from "../Header/Header";
-
+import ChatIcon from "../DocumentParser/ChatIcon";
 const PdfViewer = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const pdfUrl = queryParams.get("url");
   const metadata = JSON.parse(queryParams.get("metadata"));
   const excludedFields = ["_id", "general_info_id", "nlp_id", "document_type"];
-
+  const title = metadata.general_info.title;
   const formatKey = (key) => {
     if (key === "ner") {
       return "Named Entity Recognition";
@@ -108,6 +108,7 @@ const PdfViewer = () => {
             ></iframe>
           </div>
         </div>
+        <ChatIcon title={title} />
       </div>
     </>
   );

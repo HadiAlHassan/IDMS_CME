@@ -37,8 +37,10 @@ def rag(request):
     query_engine = index.as_query_engine(node_postprocessors=[cohere_rerank])
     
     query = request.data.get('query')
+    file_name = request.data.get('title')
+    prompt = f"you are a legal llm  tool, your main task will be to answer a clients question regardig the document {file_name}."
 
-    answer = query_engine.query(query)
+    answer = query_engine.query(f"Prompt: {prompt} <Query:{query}>")
 
     # Ensure the answer is properly serialized
     response_data = {
