@@ -5,6 +5,10 @@ import { Card, CardContent } from "@mui/material";
 import classes from "./Dashboard.module.css";
 import { UpdateContext } from "../Context/UpdateContext";
 import { useContext, useState, useEffect } from "react";
+import UpcomingTrialsCard from "./UpcomingTrialsCard";
+// import CasesStatusCard from "./CasesStatusCard";
+// import CasesBarGraph from "./CasesBarGraph";
+// import ClientsListCard from "./ClientsListCard";
 import SelectImage from "../SelectComponent/ImageSelect";
 
 function Dashboard() {
@@ -36,11 +40,14 @@ function Dashboard() {
         </CardContent>
       </Card>
       <Card className={classes.column}>
-        <CardContent></CardContent>
+        <CardContent>
+          <UpcomingTrialsCard />
+        </CardContent>
       </Card>
-      <Card className={classes.column}>
-        <CardContent></CardContent>
-      </Card>
+
+      {/* <CasesStatusCard />
+      <CasesBarGraph />
+      <ClientsListCard /> */}
     </div>
   );
 }

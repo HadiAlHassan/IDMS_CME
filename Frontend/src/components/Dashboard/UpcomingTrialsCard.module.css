@@ -1,0 +1,40 @@
+.upcomingTrialsContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center content horizontally */
+  justify-content: center; /* Center content vertically */
+  padding: 1rem;
+  background-color: #3494e3; /* Example background color */
+  border-radius: 8px; /* Example border radius */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Example shadow */
+}
+
+.title {
+  font-size: 20px;
+  text-align: center; /* Center the text */
+  margin-top: 0;
+  color: white;
+}
+
+.listContainer {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap; /* To wrap the items if they overflow */
+  gap: 1rem; /* Space between items */
+  justify-content: center;
+  width: 100%;
+}
+
+.listItem {
+  background-color: #ffffff; /* White background for list items */
+  margin-bottom: 0.5rem; /* Space between items */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Light shadow */
+  padding: 0.5rem; /* Padding inside the item */
+  width: 100%; /* Make items take full width */
+  max-width: 400px; /* Optional: limit the width */
+  display: flex; /* Ensure flexbox is used */
+  flex-direction: column; /* Column layout for text */
+  align-items: center; /* Center items horizontally */
+  justify-content: center; /* Center items vertically */
+}
