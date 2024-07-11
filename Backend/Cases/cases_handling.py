@@ -245,3 +245,45 @@ def get_all_titles(request):
     except Exception as e:
         logger.error(f"Unexpected error: {str(e)}")
         return Response({'error': 'An unexpected error occurred'}, status=500)
+    
+
+from datetime import datetime
+
+ 
+@api_view(['POST'])
+def get_upcoming_trials(request):
+    try:
+        # Extract user_id from request
+        user_id = request.data.get('user_id')
+        
+        # Validate required field
+        if not user_id:
+            return Response({'error': 'user_id is required'}, status=400)
+        
+        # Connect to MongoDB
+        db = connect_to_mongo()
+        
+        # Check if the user exists in the user collection
+        user_exists = db.user.find_one({'firebase_uid': user_id})
+        if not user_exists:
+            return Response({'error': 'User does not exist'}, status=404)
+        
+        # Retrieve all cases for the given user_id with trial dates after today
+        today = datetime.utcnow().strftime('%Y-%m-%d')
+        cases = db.cases.find({'user_id': user_id, 'trial_date': {'$gt': today}})
+        
+        # Convert cases to a list of dictionaries
+        upcoming_trials = []
+        for case in cases:
+            upcoming_trials.append({
+                'caseId': str(case.get('_id')),  # Ensure caseId is a string
+                'caseName': case.get('name'),
+                'date': case.get('trial_date')
+            })
+        
+        upcoming_trials = sorted(upcoming_trials, key=lambda x: x['date'])
+        return Response({'upcoming_trials': upcoming_trials}, status=200)
+    
+    except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}", exc_info=True)
+        return Response({'error': 'An unexpected error occurred'}, status=500)

@@ -13,25 +13,18 @@ function UpcomingTrialsCard() {
   const [trials, setTrials] = useState([]);
 
   useEffect(() => {
-    // const fetchTrials = async () => {
-    //   try {
-    //     const response = await axios.get(
-    //       "http://localhost:8000/api/upcoming-trials"
-    //     );
-    //     setTrials(response.data);
-    //   } catch (error) {
-    //     console.error("Error fetching trial dates:", error);
-    //   }
-    // };
-    // fetchTrials();
-    const dummyData = [
-      { caseId: 1, caseName: "Case A", date: "2024-07-13" },
-      { caseId: 2, caseName: "Case B", date: "2024-07-20" },
-      { caseId: 3, caseName: "Case C", date: "2024-09-01" },
-      { caseId: 4, caseName: "Case D", date: "2024-09-15" },
-      { caseId: 5, caseName: "Case A", date: "2024-07-13" },
-    ];
-    setTrials(dummyData);
+    const fetchTrials = async () => {
+      try {
+        const response = await axios.post(
+          "http://localhost:8000/api/upcoming-trials",
+          { user_id: localStorage["firebase_id"] } // Replace with actual user ID
+        );
+        setTrials(response.data.upcoming_trials);
+      } catch (error) {
+        console.error("Error fetching trial dates:", error);
+      }
+    };
+    fetchTrials();
   }, []);
 
   const getDateColor = (date) => {
